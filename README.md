@@ -170,28 +170,28 @@ aiohttp-swagger also allow to build an external YAML Swagger file and load it be
 
 ```python
 
-    from aiohttp import web
-    from aiohttp_swagger import *
+from aiohttp import web
+from aiohttp_swagger import *
 
-    async def ping(request):
-        """
-        This is my usually Sphinx doc
-    
-        >>> import json
-        >>> ping(None)
-        
-        :param request: Context injected by aiohttp framework
-        :type request: RequestHandler
-        """
-        return web.Response(text="pong")
+async def ping(request):
+    """
+    This is my usually Sphinx doc
 
-    app = web.Application()
+    >>> import json
+    >>> ping(None)
     
-    app.router.add_route('GET', "/ping", ping)
-    
-    setup_swagger(app, swagger_from_file="example_swagger.yaml")  # <-- Loaded Swagger from external YAML file
-    
-    web.run_app(app, host="127.0.0.1")
+    :param request: Context injected by aiohttp framework
+    :type request: RequestHandler
+    """
+    return web.Response(text="pong")
+
+app = web.Application()
+
+app.router.add_route('GET', "/ping", ping)
+
+setup_swagger(app, swagger_from_file="example_swagger.yaml")  # <-- Loaded Swagger from external YAML file
+
+web.run_app(app, host="127.0.0.1")
 ```
 
 F.A.Q.
