@@ -26,8 +26,7 @@ Install aiohttp-swagger is so easy:
 $ python3.5 -m pip install aiohttp-swagger
 ```
 
-With extra performance
-++++++++++++++++++++++
+### With extra performance
 
 Aiohttp-swagger also includes some optional dependencies to add extra performance but requires a bit different installation, because they (usually) depends of C extensions.
 
@@ -82,8 +81,7 @@ It produces:
 Adding Swagger from external file
 ---------------------------------
 
-Per End-Point level
-+++++++++++++++++++
+### Per End-Point level
 
 We can add the Swagger doc from an external YAML file at end-point level. You only need to decorate the end-point function handler:
 
@@ -166,8 +164,7 @@ responses:
 
 **Pay attention that file doesn't contain information about HTTP Method o End-Point name. This information will be added automatically**.
 
-Global Swagger YAML
-+++++++++++++++++++
+### Global Swagger YAML
 
 aiohttp-swagger also allow to build an external YAML Swagger file and load it before:
 
@@ -269,8 +266,7 @@ If you need more examples, there're some available in at folder: **aiohttp_swagg
 What's new?
 -----------
 
-Version 1.0.0
-+++++++++++++
+### Version 1.0.0
 
 - First version released
 
