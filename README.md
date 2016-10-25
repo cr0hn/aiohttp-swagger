@@ -260,7 +260,7 @@ You can read the Swagger parameters and format at:
 
 [OpenAPI Spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
     
-If you need more examples, there're some available in at folder: (aiohttp_swagger/examples)[https://github.com/cr0hn/aiohttp-swagger/tree/master/aiohttp_swagger/examples].
+If you need more examples, there're some available in at folder: [aiohttp_swagger/examples](https://github.com/cr0hn/aiohttp-swagger/tree/master/aiohttp_swagger/examples).
 
 What's new?
 -----------
@@ -269,4 +269,4 @@ What's new?
 
 - First version released
 
-You can read entire list in (CHANGELOG)[https://github.com/cr0hn/aiohttp-swagger/blob/master/CHANGELOG] file.
+You can read entire list in [CHANGELOG](https://github.com/cr0hn/aiohttp-swagger/blob/master/CHANGELOG) file.
