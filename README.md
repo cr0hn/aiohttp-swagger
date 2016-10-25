@@ -197,11 +197,11 @@ web.run_app(app, host="127.0.0.1")
 F.A.Q.
 ------
 
-Q: Where start the Swagger documentation in my function doc?
-A: aiohttp-swagger try to find the string **---**. When it find this string pattern, the next text until the end of function are considered Swagger doc.
+- Q: Where start the Swagger documentation in my function doc?
+- A: aiohttp-swagger try to find the string **---**. When it find this string pattern, the next text until the end of function are considered Swagger doc.
 
-Q: Can I Combine the Swagger documentation with my usually Sphinx doc?
-A: Sure! Your Sphinx doc must be first of the **---** limiter.
+- Q: Can I Combine the Swagger documentation with my usually Sphinx doc?
+- A: Sure! Your Sphinx doc must be first of the **---** limiter.
 
 ```python
 
@@ -229,13 +229,13 @@ async def ping(request):
     """
 ```
 
-Q: How can I group a list of End-Point?
-A: End-Point will be grouped by their title. The end-point with the same title will be grouped automatically:
+- Q: How can I group a list of End-Point?
+- A: End-Point will be grouped by their title. The end-point with the same title will be grouped automatically:
 
 ![Swagger title](aiohttp_swagger/doc/images/swagger_title.jpg)
 
-Q: How can I change the Title of a group of End-Points?
-A: Swagger has a tag that uses to build the titles. The tag name is **tags**. The format is:
+- Q: How can I change the Title of a group of End-Points?
+- A: Swagger has a tag that uses to build the titles. The tag name is **tags**. The format is:
  
 ```yaml
 tags:  # <-- TAG USEF FOR THE TITLE
@@ -250,8 +250,8 @@ responses:
         description: invalid HTTP Method
 ```
 
-Q: What happens if I use YAML file and function documentation for build Swagger doc at the same time?
-A: If two method are provided, aiohttp-swagger will use the YAML over the function doc.
+- Q: What happens if I use YAML file and function documentation for build Swagger doc at the same time?
+- A: If two method are provided, aiohttp-swagger will use the YAML over the function doc.
 
 Swagger Documentation & Examples
 --------------------------------
