@@ -1,7 +1,7 @@
 aiohttp-swagger
 ===============
 
-![Logo](aiohttp_swagger/doc/images/logo.png)
+![Logo](doc/images/logo.png)
 
 *aiohttp-swagger: Swagger API Documentation builder for aiohttp server*
 
@@ -76,7 +76,7 @@ web.run_app(app, host="127.0.0.1")
 
 It produces:
 
-![Swagger Ping Example](aiohttp_swagger/doc/images/swagger_ping.jpg)
+![Swagger Ping Example](doc/images/swagger_ping.jpg)
 
 Where to access to API Doc
 --------------------------
@@ -168,7 +168,7 @@ web.run_app(app, host="127.0.0.1")
 
 It produces:
 
-![Swagger custom display params](aiohttp_swagger/doc/images/swagger_custom_params.jpg)
+![Swagger custom display params](doc/images/swagger_custom_params.jpg)
 
 
 Adding Swagger from external file
@@ -325,7 +325,7 @@ async def ping(request):
 - Q: How can I group a list of End-Point?
 - A: End-Point will be grouped by their title. The end-point with the same title will be grouped automatically:
 
-![Swagger title](aiohttp_swagger/doc/images/swagger_title.jpg)
+![Swagger title](doc/images/swagger_title.jpg)
 
 - Q: How can I change the Title of a group of End-Points?
 - A: Swagger has a tag that uses to build the titles. The tag name is **tags**. The format is:
