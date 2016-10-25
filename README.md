@@ -78,6 +78,99 @@ It produces:
 
 ![Swagger Ping Example](aiohttp_swagger/doc/images/swagger_ping.jpg)
 
+Where to access to API Doc
+--------------------------
+
+By default, API will be generated at URL: yourdomain.com**/api/doc**.
+
+You can modify the URI adding the parameter **swagger_url** in **setup_swagger**:
+
+```python
+
+from aiohttp import web
+from aiohttp_swagger import *
+
+async def ping(request):
+    """
+    ---
+    description: This end-point allow to test that service is up.
+    tags:
+    - Health check
+    produces:
+    - text/plain
+    responses:
+        "200":
+            description: successful operation. Return "pong" text
+        "405":
+            description: invalid HTTP Method
+    """
+    return web.Response(text="pong")
+
+
+app = web.Application()
+app.router.add_route('GET', "/ping", ping)
+
+setup_swagger(app, swagger_url="/api/v1/doc")  # <-- NEW Doc URI
+
+web.run_app(app, host="127.0.0.1")
+```
+
+Customizing Doc description and more
+------------------------------------
+
+You can change this valued for Swagger doc:
+
+1. API Base URL: Modify global prefix of your API.
+2. Description: Long description of your API
+3. API Version: Version of your API
+4. Title: Title for your API
+5. Contact: Contact info.
+
+```python
+
+from aiohttp import web
+from aiohttp_swagger import *
+
+async def ping(request):
+    """
+    ---
+    description: This end-point allow to test that service is up.
+    tags:
+    - Health check
+    produces:
+    - text/plain
+    responses:
+        "200":
+            description: successful operation. Return "pong" text
+        "405":
+            description: invalid HTTP Method
+    """
+    return web.Response(text="pong")
+
+app = web.Application()
+
+app.router.add_route('GET', "/ping", ping)
+
+long_description = """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vehicula, metus et sodales fringilla, purus leo aliquet odio, non tempor ante urna aliquet nibh. Integer accumsan laoreet tincidunt. Vestibulum semper vehicula sollicitudin. Suspendisse dapibus neque vitae mattis bibendum. Morbi eu pulvinar turpis, quis malesuada ex. Vestibulum sed maximus diam. Proin semper fermentum suscipit. Duis at suscipit diam. Integer in augue elementum, auctor orci ac, elementum est. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Maecenas condimentum id arcu quis volutpat. Vestibulum sit amet nibh sodales, iaculis nibh eget, scelerisque justo.
+
+Nunc eget mauris lectus. Proin sit amet volutpat risus. Aliquam auctor nunc sit amet feugiat tempus. Maecenas nec ex dolor. Nam fermentum, mauris ut suscipit varius, odio purus luctus mauris, pretium interdum felis sem vel est. Proin a turpis vitae nunc volutpat tristique ac in erat. Pellentesque consequat rhoncus libero, ac sollicitudin odio tempus a. Sed vestibulum leo erat, ut auctor turpis mollis id. Ut nec nunc ex. Maecenas eu turpis in nibh placerat ullamcorper ac nec dui. Integer ac lacus neque. Donec dictum tellus lacus, a vulputate justo venenatis at. Morbi malesuada tellus quis orci aliquet, at vulputate lacus imperdiet. Nulla eu diam quis orci aliquam vulputate ac imperdiet elit. Quisque varius mollis dolor in interdum.
+"""
+
+setup_swagger(app,
+              description=long_description,
+              title="My Custom Title",
+              api_version="1.0.3",
+              contact="my.custom.contact@example.com")
+
+web.run_app(app, host="127.0.0.1")
+```
+
+It produces:
+
+![Swagger custom display params](aiohttp_swagger/doc/images/swagger_custom_params.jpg)
+
+
 Adding Swagger from external file
 ---------------------------------
 
