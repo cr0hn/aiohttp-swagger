@@ -3,7 +3,7 @@ aiohttp-swagger
 
 ![Logo](aiohttp_swagger/doc/images/logo.png)
 
-*aiohttp-swagger: Swagger API Documentation for aiohttp server*
+*aiohttp-swagger: Swagger API Documentation builder for aiohttp server*
 
 Code | https://github.com/cr0hn/aiohttp-swagger
 ---- | ----------------------------------------------
@@ -18,8 +18,7 @@ aiohttp-swagger is a plugin for aiohttp.web server that allow to document APIs u
 Installation
 ------------
 
-Simple
-++++++
+### Simple
 
 Install aiohttp-swagger is so easy:
 
