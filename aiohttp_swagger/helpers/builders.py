@@ -14,7 +14,7 @@ from jinja2 import Template
 SWAGGER_TEMPLATE = abspath(join(dirname(__file__), "..", "templates"))
 
 
-def build_doc_from_func_doc(route):
+def _build_doc_from_func_doc(route):
     end_point_doc = route.handler.__doc__.splitlines()
     
     # Find Swagger start point in doc
@@ -69,7 +69,7 @@ def generate_doc_from_each_end_point(app: web.Application,
         
         # Check if end-point has Swagger doc
         elif route.handler.__doc__ is not None and "---" in route.handler.__doc__:
-            end_point_doc = build_doc_from_func_doc(route)
+            end_point_doc = _build_doc_from_func_doc(route)
         
         # there is doc available?
         if end_point_doc:

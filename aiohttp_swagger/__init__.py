@@ -5,19 +5,17 @@ from aiohttp import web
 from .helpers import swagger_path, generate_doc_from_each_end_point, load_doc_from_yaml_file
 
 
-async def swagger_home(request):
+async def _swagger_home(request):
+    """
+    Return the index.html main file
+    """
     return web.Response(text=request.app["SWAGGER_TEMPLATE_CONTENT"], content_type="text/html")
 
 
-async def swagger_def(request):
+async def _swagger_def(request):
     """
-    asdfasf a sf asd f
-    :param request:
-    :type request:
-    :return:
-    :rtype:
+    Returns the Swagger JSON Definition
     """
-    # return web.Response(text=request.app["SWAGGER_DEF_CONTENT"], content_type="application/json")
     return web.json_response(text=request.app["SWAGGER_DEF_CONTENT"])
 
 
@@ -48,9 +46,9 @@ def setup_swagger(app: web.Application,
                                                         contact=contact)
     
     # Add API routes
-    app.router.add_route('GET', _swagger_url, swagger_home)
-    app.router.add_route('GET', "{}/".format(_swagger_url), swagger_home)
-    app.router.add_route('GET', _swagger_def_url, swagger_def)
+    app.router.add_route('GET', _swagger_url, _swagger_home)
+    app.router.add_route('GET', "{}/".format(_swagger_url), _swagger_home)
+    app.router.add_route('GET', _swagger_def_url, _swagger_def)
     
     # Set statics
     statics_path = '{}/swagger_static'.format(_swagger_url)
