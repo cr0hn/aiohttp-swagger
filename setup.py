@@ -37,7 +37,7 @@ with open(join(dirname(__file__), 'README.md')) as f:
 
 setup(
     name='aiohttp-swagger',
-    version='1.0.0',
+    version='1.0.1',
     install_requires=required,
     url='https://github.com/cr0hn/aiohttp-swagger',
     license='BSD',
