@@ -255,7 +255,7 @@ responses:
 
 ```
 
-**Pay attention that file doesn't contain information about HTTP Method o End-Point name. This information will be added automatically**.
+**Pay attention that file doesn't contain information about HTTP Method or End-Point name. This information will be added automatically**.
 
 ### Global Swagger YAML
 
