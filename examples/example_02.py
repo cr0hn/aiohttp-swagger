@@ -3,14 +3,6 @@ from os.path import join, dirname
 from aiohttp import web
 
 if __name__ == '__main__':
-    import os
-    import sys
-    
-    parent_dir = os.path.dirname(os.path.dirname(os.path.join("..", os.path.abspath(__file__))))
-    sys.path.insert(1, parent_dir)
-    import aiohttp_swagger
-    
-    __package__ = str("aiohttp_swagger")
     
     from aiohttp_swagger import *
 
@@ -20,7 +12,7 @@ if __name__ == '__main__':
 
         ---
         tags:
-        - Example
+        - user
         summary: Create user
         description: This can only be done by the logged in user.
         operationId: examples.api.api.createUser
@@ -62,37 +54,7 @@ if __name__ == '__main__':
         return web.Response(text="Example")
 
 
-    @swagger_path("example_swagger_partial.yaml")
     async def example_2(request):
-        """
-        Description end-point
-        
-        ---
-        tags:
-        - Example
-        summary: Create user
-        description: This can only be done by the logged in user.
-        operationId: examples.api.api.createUser
-        produces:
-        - application/json
-        responses:
-        "302":
-            description: successful operation
-            schema:
-              type: string
-            headers:
-              Location:
-                description: URL of redirected site
-                type: string
-        "404":
-            description: short URL not found
-        "405":
-            description: invalid HTTP Method
-        
-        """
-        return web.Response(text="Example")
-
-    async def example_3(request):
         """
         Description end-point
         """
@@ -102,8 +64,7 @@ if __name__ == '__main__':
     
     app.router.add_route('GET', "/example1", example_1)
     app.router.add_route('GET', "/example2", example_2)
-    app.router.add_route('GET', "/example3", example_3)
     
-    setup_swagger(app)
+    setup_swagger(app, swagger_from_file="example_swagger.yaml")
     
     web.run_app(app, host="127.0.0.1")
