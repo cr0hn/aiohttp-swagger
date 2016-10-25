@@ -1,0 +1,21 @@
+include LICENSE CHANGELOG README.md requirements.txt requirements-performance.txt
+recursive-include aiohttp_swagger/templates *
+recursive-include aiohttp_swagger/swagger_ui *
+
+recursive-exclude * __pycache__
+recursive-exclude * *.pyc
+recursive-exclude * *.pyo
+recursive-exclude * *.orig
+recursive-exclude * .DS_Store
+global-exclude __pycache__/*
+global-exclude .deps/*
+global-exclude *.so
+global-exclude *.pyd
+global-exclude *.pyc
+global-exclude .git*
+global-exclude .DS_Store
+global-exclude .mailmap
+prune aiohttp_swagger/doc*
+
+graft aiohttp_swagger/resources/*
+

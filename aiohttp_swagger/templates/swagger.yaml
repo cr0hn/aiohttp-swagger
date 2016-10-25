@@ -1,0 +1,15 @@
+swagger: "2.0"
+info:
+  description: |
+    {{ description }}
+  version: "{{ version }}"
+  title: {{ title }}
+  {% if contact %}
+  contact:
+    name: {{ contact }}
+  {% endif %}
+basePath: {{ base_path }}
+schemes:
+  - http
+  - https
+paths:
