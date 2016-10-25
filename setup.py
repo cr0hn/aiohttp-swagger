@@ -48,7 +48,7 @@ setup(
     extras_require={
         'performance':  required_performance
     },
-    description='Swagger API Documentation for aiohttp server',
+    description='Swagger API Documentation builder for aiohttp server',
     long_description=long_description,
     classifiers=[
         'Environment :: Console',
