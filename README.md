@@ -353,7 +353,7 @@ You can read the Swagger parameters and format at:
 
 [OpenAPI Spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
     
-If you need more examples, there're some available in at folder: [aiohttp_swagger/examples](https://github.com/cr0hn/aiohttp-swagger/tree/master/aiohttp_swagger/examples).
+If you need more examples, there're some available in at folder: [aiohttp_swagger/examples](https://github.com/cr0hn/aiohttp-swagger/tree/master/examples).
 
 What's new?
 -----------
