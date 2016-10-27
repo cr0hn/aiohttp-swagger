@@ -37,7 +37,7 @@ async def test_swagger_file_url(test_client, loop):
 
     app = web.Application(loop=loop)
     setup_swagger(app,
-                  swagger_from_file=TESTS_PATH+"/data/example_swagger.yaml")
+                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
 
     client = await test_client(app)
     resp1 = await client.get('/api/doc/swagger.json')
