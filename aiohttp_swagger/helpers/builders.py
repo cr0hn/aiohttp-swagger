@@ -79,7 +79,7 @@ def generate_doc_from_each_end_point(app: web.Application,
             else:
                 url = url_info.get("formatter")
     
-            swagger["paths"][url] = end_point_doc
+            swagger["paths"][url].update(end_point_doc)
     
     return json.dumps(swagger)
 
