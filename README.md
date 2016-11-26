@@ -8,12 +8,12 @@ aiohttp-swagger
 Code | https://github.com/cr0hn/aiohttp-swagger
 ---- | ----------------------------------------------
 Issues | https://github.com/cr0hn/aiohttp-swagger/issues/
-Python version | Python 3.5 and above
+Python version | Python 3.4 and above
 
 What's aiohttp-swagger
 ----------------------
 
-aiohttp-swagger is a plugin for aiohttp.web server that allow to document APIs using Swagger show the Swagger-ui console. 
+aiohttp-swagger is a plugin for aiohttp.web server that allow to document APIs using Swagger show the Swagger-ui console.
 
 Installation
 ------------
@@ -36,7 +36,7 @@ To install the tool with extra performance you must do:
 $ python3.5 -m pip install 'aiohttp-swagger[performance]'
 ```
 
-**Remember that aiohttp-swagger only runs in Python 3.5 and above**.
+**Remember that aiohttp-swagger only runs in Python 3.4 and above**.
 
 Quick start
 -----------
@@ -272,7 +272,7 @@ async def ping(request):
 
     >>> import json
     >>> ping(None)
-    
+
     :param request: Context injected by aiohttp framework
     :type request: RequestHandler
     """
@@ -301,13 +301,13 @@ F.A.Q.
 async def ping(request):
     """
     This is my usually Sphinx doc
-    
+
     >>> import json
     >>> ping(None)
-    
-    :param request: Context injected by aiohttp framework  
-    :type request: RequestHandler 
-    
+
+    :param request: Context injected by aiohttp framework
+    :type request: RequestHandler
+
     ---
     description: This end-point allow to test that service is up.
     tags:
@@ -329,7 +329,7 @@ async def ping(request):
 
 - Q: How can I change the Title of a group of End-Points?
 - A: Swagger has a tag that uses to build the titles. The tag name is **tags**. The format is:
- 
+
 ```yaml
 tags:  # <-- TAG USEF FOR THE TITLE
 - Health check
@@ -352,7 +352,7 @@ Swagger Documentation & Examples
 You can read the Swagger parameters and format at:
 
 [OpenAPI Spec](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
-    
+
 If you need more examples, there're some available in at folder: [aiohttp_swagger/examples](https://github.com/cr0hn/aiohttp-swagger/tree/master/examples).
 
 What's new?

@@ -1,3 +1,4 @@
+import asyncio
 from os.path import join, dirname, abspath
 
 from aiohttp import web
@@ -5,14 +6,16 @@ from aiohttp import web
 from .helpers import swagger_path, generate_doc_from_each_end_point, load_doc_from_yaml_file
 
 
-async def _swagger_home(request):
+@asyncio.coroutine
+def _swagger_home(request):
     """
     Return the index.html main file
     """
     return web.Response(text=request.app["SWAGGER_TEMPLATE_CONTENT"], content_type="text/html")
 
 
-async def _swagger_def(request):
+@asyncio.coroutine
+def _swagger_def(request):
     """
     Returns the Swagger JSON Definition
     """
@@ -33,7 +36,7 @@ def setup_swagger(app: web.Application,
                   contact: str = ""):
     _swagger_url = "/{}".format(swagger_url) if not swagger_url.startswith("/") else swagger_url
     _swagger_def_url = '{}/swagger.json'.format(_swagger_url)
-    
+
     # Build Swagget Info
     if swagger_from_file:
         swagger_info = load_doc_from_yaml_file(swagger_from_file)
@@ -44,16 +47,16 @@ def setup_swagger(app: web.Application,
                                                         api_version=api_version,
                                                         title=title,
                                                         contact=contact)
-    
+
     # Add API routes
     app.router.add_route('GET', _swagger_url, _swagger_home)
     app.router.add_route('GET', "{}/".format(_swagger_url), _swagger_home)
     app.router.add_route('GET', _swagger_def_url, _swagger_def)
-    
+
     # Set statics
     statics_path = '{}/swagger_static'.format(_swagger_url)
     app.router.add_static(statics_path, STATIC_PATH)
-    
+
     # --------------------------------------------------------------------------
     # Build templates
     # --------------------------------------------------------------------------
