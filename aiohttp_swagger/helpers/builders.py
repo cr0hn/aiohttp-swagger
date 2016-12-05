@@ -1,12 +1,12 @@
-from os.path import join, dirname, abspath
-from collections import defaultdict
-
 import yaml
 
 try:
     import ujson as json
 except ImportError:
     import json
+
+from collections import defaultdict
+from os.path import join, dirname, abspath
 
 from aiohttp import web
 from jinja2 import Template
