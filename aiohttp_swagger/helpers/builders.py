@@ -29,8 +29,8 @@ def _build_doc_from_func_doc(route):
         end_point_swagger_doc = yaml.load("\n".join(end_point_doc[end_point_swagger_start:]))
     except yaml.YAMLError:
         end_point_swagger_doc = {
-            "description": "⚠ YAML document could not be loaded ⚠",
-            "tags": ["Invalid YAML docstring"]
+            "description": "⚠ Swagger document could not be loaded from docstring ⚠",
+            "tags": ["Invalid Swagger"]
         }
 
     # Add to general Swagger doc
@@ -71,7 +71,24 @@ def generate_doc_from_each_end_point(app: web.Application,
 
         # If route has a external link to doc, we use it, not function doc
         if getattr(route.handler, "swagger_file", False):
-            end_point_doc = yaml.load(open(route.handler.swagger_file, "r").read())
+            try:
+                end_point_doc = {
+                    route.method.lower(): yaml.load(open(route.handler.swagger_file, "r").read())
+                }
+            except yaml.YAMLError:
+                end_point_doc = {
+                    route.method.lower(): {
+                        "description": "⚠ Swagger document could not be loaded from file ⚠",
+                        "tags": ["Invalid Swagger"]
+                    }
+                }
+            except FileNotFoundError:
+                end_point_doc = {
+                    route.method.lower(): {
+                        "description": "⚠ Swagger file not found ({}) ⚠".format(route.handler.swagger_file),
+                        "tags": ["Invalid Swagger"]
+                    }
+                }
 
         # Check if end-point has Swagger doc
         elif route.handler.__doc__ is not None and "---" in route.handler.__doc__:
