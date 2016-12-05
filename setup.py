@@ -49,7 +49,7 @@ class PyTest(TestCommand):
 
 setup(
     name='aiohttp-swagger',
-    version='1.0.2',
+    version='1.0.3',
     install_requires=required,
     url='https://github.com/cr0hn/aiohttp-swagger',
     license='BSD',
@@ -70,6 +70,7 @@ setup(
         'Operating System :: MacOS',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX',
+        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Topic :: Security',
     ],
