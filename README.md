@@ -5,8 +5,8 @@ aiohttp-swagger
 
 *aiohttp-swagger: Swagger API Documentation builder for aiohttp server*
 
-Documentation |  https://aiohttp-swagger.readthedocs.org/
-------------- | -----------------------------------------
+Documentation |  http://aiohttp-swagger.readthedocs.io/en/latest/
+------------- | -------------------------------------------------
 Code | https://github.com/cr0hn/aiohttp-swagger
 Issues | https://github.com/cr0hn/aiohttp-swagger/issues/
 Python version | Python 3.4 and above

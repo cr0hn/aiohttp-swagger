@@ -33,8 +33,7 @@ extensions = [
     'alabaster',
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinx.ext.mathjax',
-    'sphinxcontrib.asyncio'
+    'sphinx.ext.mathjax'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
