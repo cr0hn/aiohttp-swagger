@@ -2,6 +2,7 @@ aiohttp-swagger
 ===============
 
 ![Logo](doc/source/_static/logo.png)
+
 [![Build Status](https://travis-ci.org/cr0hn/aiohttp-swagger.svg?branch=master)](https://travis-ci.org/cr0hn/aiohttp-swagger)
 
 *aiohttp-swagger: Swagger API Documentation builder for aiohttp server*
