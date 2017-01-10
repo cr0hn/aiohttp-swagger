@@ -5,3 +5,4 @@ class swagger_path(object):
     def __call__(self, f):
         f.swagger_file = self.swagger_file
         return f
+

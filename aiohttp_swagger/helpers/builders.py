@@ -1,15 +1,15 @@
-from collections import defaultdict
-from os.path import abspath, dirname, join
-
 import yaml
-from aiohttp import web
-from jinja2 import Template
 
 try:
     import ujson as json
 except ImportError:
     import json
 
+from collections import defaultdict
+from os.path import join, dirname, abspath
+
+from aiohttp import web
+from jinja2 import Template
 
 SWAGGER_TEMPLATE = abspath(join(dirname(__file__), "..", "templates"))
 
@@ -26,13 +26,10 @@ def _build_doc_from_func_doc(route):
 
     # Build JSON YAML Obj
     try:
-        end_point_swagger_doc = (
-            yaml.load("\n".join(end_point_doc[end_point_swagger_start:]))
-        )
+        end_point_swagger_doc = yaml.load("\n".join(end_point_doc[end_point_swagger_start:]))
     except yaml.YAMLError:
         end_point_swagger_doc = {
-            "description": "⚠ Swagger document could not be loaded "
-                           "from docstring ⚠",
+            "description": "⚠ Swagger document could not be loaded from docstring ⚠",
             "tags": ["Invalid Swagger"]
         }
 
@@ -40,14 +37,13 @@ def _build_doc_from_func_doc(route):
     return {route.method.lower(): end_point_swagger_doc}
 
 
-def generate_doc_from_each_end_point(
-        app: web.Application,
-        *,
-        api_base_url: str = "/",
-        description: str = "Swagger API definition",
-        api_version: str = "1.0.0",
-        title: str = "Swagger API",
-        contact: str = ""):
+def generate_doc_from_each_end_point(app: web.Application,
+                                     *,
+                                     api_base_url: str = "/",
+                                     description: str = "Swagger API definition",
+                                     api_version: str = "1.0.0",
+                                     title: str = "Swagger API",
+                                     contact: str = ""):
     # Clean description
     _start_desc = 0
     for i, word in enumerate(description):
@@ -57,13 +53,12 @@ def generate_doc_from_each_end_point(
     cleaned_description = "    ".join(description[_start_desc:].splitlines())
 
     # Load base Swagger template
-    swagger_base = (
-        Template(open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r").read()).render(
-            description=cleaned_description,
-            version=api_version,
-            title=title,
-            contact=contact,
-            base_path=api_base_url)
+    swagger_base = Template(open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r").read()).render(
+        description=cleaned_description,
+        version=api_version,
+        title=title,
+        contact=contact,
+        base_path=api_base_url
     )
 
     # The Swagger OBJ
@@ -78,30 +73,25 @@ def generate_doc_from_each_end_point(
         if getattr(route.handler, "swagger_file", False):
             try:
                 end_point_doc = {
-                    route.method.lower():
-                        yaml.load(open(route.handler.swagger_file, "r").read())
+                    route.method.lower(): yaml.load(open(route.handler.swagger_file, "r").read())
                 }
             except yaml.YAMLError:
                 end_point_doc = {
                     route.method.lower(): {
-                        "description": "⚠ Swagger document could not be "
-                                       "loaded from file ⚠",
+                        "description": "⚠ Swagger document could not be loaded from file ⚠",
                         "tags": ["Invalid Swagger"]
                     }
                 }
             except FileNotFoundError:
                 end_point_doc = {
                     route.method.lower(): {
-                        "description":
-                            "⚠ Swagger file not "
-                            "found ({}) ⚠".format(route.handler.swagger_file),
+                        "description": "⚠ Swagger file not found ({}) ⚠".format(route.handler.swagger_file),
                         "tags": ["Invalid Swagger"]
                     }
                 }
 
         # Check if end-point has Swagger doc
-        elif (route.handler.__doc__ is not None
-              and "---" in route.handler.__doc__):
+        elif route.handler.__doc__ is not None and "---" in route.handler.__doc__:
             end_point_doc = _build_doc_from_func_doc(route)
 
         # there is doc available?
