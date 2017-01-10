@@ -2,6 +2,7 @@ aiohttp-swagger
 ===============
 
 ![Logo](doc/source/_static/logo.png)
+[![Build Status][travis-image]][travis-url] [![codecov.io](https://codecov.io/cr0hn/aiohttp-swagger/codecov.io/coverage.svg?branch=master)](https://codecov.io/cr0hn/aiohttp-swagger/codecov.io?branch=master)
 
 *aiohttp-swagger: Swagger API Documentation builder for aiohttp server*
 
