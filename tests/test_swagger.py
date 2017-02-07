@@ -1,5 +1,7 @@
 import asyncio
 import json
+import pytest
+import yaml
 from os.path import join, dirname, abspath
 
 from aiohttp import web
@@ -97,7 +99,6 @@ def test_swagger_home_decorator(test_client, loop):
     assert 'Test Custom Title' in result['info']['title']
 
 
-
 @asyncio.coroutine
 def test_swagger_def_decorator(test_client, loop):
     app = web.Application(loop=loop)
@@ -118,3 +119,28 @@ def test_swagger_def_decorator(test_client, loop):
     result = json.loads(text)
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
+
+
+@pytest.fixture
+def swagger_info():
+    filename = abspath(join(dirname(__file__))) + "/data/example_swagger.yaml"
+    return yaml.load(open(filename).read())
+
+
+@asyncio.coroutine
+def test_swagger_info(test_client, loop, swagger_info):
+    app = web.Application(loop=loop)
+    app.router.add_route('GET', "/ping", ping)
+    description = "Test Custom Swagger"
+    setup_swagger(app,
+                  swagger_url="/api/v1/doc",
+                  swagger_info=swagger_info)
+
+    client = yield from test_client(app)
+    resp1 = yield from client.get('/api/v1/doc/swagger.json')
+    assert resp1.status == 200
+    text = yield from resp1.text()
+    result = json.loads(text)
+    assert '/example1' in result['paths']
+    assert '/example2' in result['paths']
+    assert 'API Title' in result['info']['title']
