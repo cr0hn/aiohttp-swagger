@@ -1,10 +1,16 @@
 import asyncio
 from os.path import abspath, dirname, join
+from types import FunctionType
 
 from aiohttp import web
 
 from .helpers import (generate_doc_from_each_end_point,
                       load_doc_from_yaml_file, swagger_path)
+
+try:
+    import ujson as json
+except ImportError:
+    import json
 
 
 @asyncio.coroutine
@@ -37,25 +43,40 @@ def setup_swagger(app: web.Application,
                   description: str = "Swagger API definition",
                   api_version: str = "1.0.0",
                   title: str = "Swagger API",
-                  contact: str = ""):
+                  contact: str = "",
+                  swagger_home_decor: FunctionType = None,
+                  swagger_def_decor: FunctionType = None,
+                  swagger_info: dict = None):
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
                     else swagger_url)
     _swagger_def_url = '{}/swagger.json'.format(_swagger_url)
 
     # Build Swagget Info
-    if swagger_from_file:
-        swagger_info = load_doc_from_yaml_file(swagger_from_file)
+    if swagger_info is None:
+        if swagger_from_file:
+            swagger_info = load_doc_from_yaml_file(swagger_from_file)
+        else:
+            swagger_info = generate_doc_from_each_end_point(
+                app, api_base_url=api_base_url, description=description,
+                api_version=api_version, title=title, contact=contact
+            )
     else:
-        swagger_info = generate_doc_from_each_end_point(
-            app, api_base_url=api_base_url, description=description,
-            api_version=api_version, title=title, contact=contact
-        )
+        swagger_info = json.dumps(swagger_info)
+
+    _swagger_home_func = _swagger_home
+    _swagger_def_func = _swagger_def
+
+    if swagger_home_decor is not None:
+        _swagger_home_func = swagger_home_decor(_swagger_home)
+
+    if swagger_def_decor is not None:
+        _swagger_def_func = swagger_def_decor(_swagger_def)
 
     # Add API routes
-    app.router.add_route('GET', _swagger_url, _swagger_home)
-    app.router.add_route('GET', "{}/".format(_swagger_url), _swagger_home)
-    app.router.add_route('GET', _swagger_def_url, _swagger_def)
+    app.router.add_route('GET', _swagger_url, _swagger_home_func)
+    app.router.add_route('GET', "{}/".format(_swagger_url), _swagger_home_func)
+    app.router.add_route('GET', _swagger_def_url, _swagger_def_func)
 
     # Set statics
     statics_path = '{}/swagger_static'.format(_swagger_url)
