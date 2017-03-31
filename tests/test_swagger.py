@@ -26,6 +26,12 @@ def ping(request):
     return web.Response(text="pong")
 
 
+@swagger_path(abspath(join(dirname(__file__))) + '/data/partial_swagger.yaml')
+@asyncio.coroutine
+def ping_partial(request):
+    return web.Response(text="pong")
+
+
 @asyncio.coroutine
 def test_ping(test_client, loop):
     app = web.Application(loop=loop)
@@ -54,6 +60,20 @@ def test_swagger_file_url(test_client, loop):
     assert '/example1' in result['paths']
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
+
+
+@asyncio.coroutine
+def test_partial_swagger_file(test_client, loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('GET', "/ping-partial", ping_partial)
+    setup_swagger(app)
+
+    client = yield from test_client(app)
+    resp1 = yield from client.get('/api/doc/swagger.json')
+    assert resp1.status == 200
+    text = yield from resp1.text()
+    result = json.loads(text)
+    assert '/ping-partial' in result['paths']
 
 
 @asyncio.coroutine
