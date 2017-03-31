@@ -86,11 +86,12 @@ def setup_swagger(app: web.Application,
     # Build templates
     # --------------------------------------------------------------------------
     app["SWAGGER_DEF_CONTENT"] = swagger_info
-    app["SWAGGER_TEMPLATE_CONTENT"] = (
-        open(join(STATIC_PATH, "index.html"), "r").read()
-        .replace("##SWAGGER_CONFIG##", _swagger_def_url)
-        .replace("##STATIC_PATH##", statics_path)
-    )
+    with open(join(STATIC_PATH, "index.html"), "r") as f:
+        app["SWAGGER_TEMPLATE_CONTENT"] = (
+            f.read()
+            .replace("##SWAGGER_CONFIG##", _swagger_def_url)
+            .replace("##STATIC_PATH##", statics_path)
+        )
 
 
 __all__ = ("setup_swagger", "swagger_path")
