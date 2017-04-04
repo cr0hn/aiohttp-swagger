@@ -57,14 +57,15 @@ def generate_doc_from_each_end_point(
     cleaned_description = "    ".join(description[_start_desc:].splitlines())
 
     # Load base Swagger template
-    swagger_base = (
-        Template(open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r").read()).render(
-            description=cleaned_description,
-            version=api_version,
-            title=title,
-            contact=contact,
-            base_path=api_base_url)
-    )
+    with open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r") as f:
+        swagger_base = (
+            Template(f.read()).render(
+                description=cleaned_description,
+                version=api_version,
+                title=title,
+                contact=contact,
+                base_path=api_base_url)
+        )
 
     # The Swagger OBJ
     swagger = yaml.load(swagger_base)
@@ -77,10 +78,11 @@ def generate_doc_from_each_end_point(
         # If route has a external link to doc, we use it, not function doc
         if getattr(route.handler, "swagger_file", False):
             try:
-                end_point_doc = {
-                    route.method.lower():
-                        yaml.load(open(route.handler.swagger_file, "r").read())
-                }
+                with open(route.handler.swagger_file, "r") as f:
+                    end_point_doc = {
+                        route.method.lower():
+                            yaml.load(f.read())
+                    }
             except yaml.YAMLError:
                 end_point_doc = {
                     route.method.lower(): {
