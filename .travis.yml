@@ -22,6 +22,9 @@ deploy:
   provider: pypi
     user: $PYPI_USER
     password: $PYPI_PASSWD
+    on:
+      branch: master
+
 #  - provider: script
 #    script: deploy/pypi.sh
 #    skip_cleanup: true
