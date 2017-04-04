@@ -36,7 +36,7 @@ from setuptools.command.test import test as TestCommand
 
 with open(join(dirname(__file__), 'requirements.txt')) as f:
     required = f.read().splitlines()
-    
+
 with open(join(dirname(__file__), 'requirements-performance.txt')) as f:
     required_performance = f.read().splitlines()
 
@@ -55,7 +55,7 @@ class PyTest(TestCommand):
 
 setup(
     name='aiohttp-swagger',
-    version='1.0.4',
+    version='1.0.5',
     install_requires=required,
     url='https://github.com/cr0hn/aiohttp-swagger',
     license='BSD',
