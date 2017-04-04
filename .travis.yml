@@ -19,8 +19,11 @@ after_success:
 deploy:
 
   # Deploy to PyPI
-  - provider: script
-    script: deploy/pypi.sh
-    skip_cleanup: true
-    on:
-      branch: master
+  provider: pypi
+    user: $PYPI_USER
+    password: $PYPI_PASSWD
+#  - provider: script
+#    script: deploy/pypi.sh
+#    skip_cleanup: true
+#    on:
+#      branch: master
