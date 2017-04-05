@@ -20,10 +20,11 @@ deploy:
 
   # Deploy to PyPI
   provider: pypi
-    user: $PYPI_USER
-    password: $PYPI_PASSWD
-    on:
-      branch: master
+  user: $PYPI_USER
+  password: $PYPI_PASSWD
+  distributions: "sdist"
+  on:
+    branch: master
 
 #  - provider: script
 #    script: deploy/pypi.sh
