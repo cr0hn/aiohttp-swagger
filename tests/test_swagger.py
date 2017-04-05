@@ -25,11 +25,13 @@ def ping(request):
     """
     return web.Response(text="pong")
 
+
 class ClassView(web.View):
-    async def _irrelevant_method(self):
+    def _irrelevant_method(self):
         pass
 
-    async def get(self):
+    @asyncio.coroutine
+    def get(self):
         """
         ---
         description: Get resources
@@ -45,7 +47,8 @@ class ClassView(web.View):
         """
         return web.Response(text="OK")
 
-    async def post(self):
+    @asyncio.coroutine
+    def post(self):
         """
         ---
         description: Post resources
