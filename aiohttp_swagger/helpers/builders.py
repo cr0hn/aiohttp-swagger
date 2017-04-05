@@ -8,7 +8,7 @@ from jinja2 import Template
 
 try:
     import ujson as json
-except ImportError:
+except ImportError: # pragma: no cover
     import json
 
 

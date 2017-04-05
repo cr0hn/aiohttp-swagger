@@ -25,6 +25,42 @@ def ping(request):
     """
     return web.Response(text="pong")
 
+class ClassView(web.View):
+    async def _irrelevant_method(self):
+        pass
+
+    async def get(self):
+        """
+        ---
+        description: Get resources
+        tags:
+        - Class View
+        produces:
+        - text/plain
+        responses:
+            "200":
+                description: successful operation.
+            "405":
+                description: invalid HTTP Method
+        """
+        return web.Response(text="OK")
+
+    async def post(self):
+        """
+        ---
+        description: Post resources
+        tags:
+        - Class View
+        produces:
+        - text/plain
+        responses:
+            "200":
+                description: successful operation.
+            "405":
+                description: invalid HTTP Method
+        """
+        return web.Response(text="OK")
+
 
 @swagger_path(abspath(join(dirname(__file__))) + '/data/partial_swagger.yaml')
 @asyncio.coroutine
@@ -164,3 +200,21 @@ def test_swagger_info(test_client, loop, swagger_info):
     assert '/example1' in result['paths']
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
+
+@asyncio.coroutine
+def test_class_view(test_client, loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('*', "/class_view", ClassView)
+    setup_swagger(app)
+
+    client = yield from test_client(app)
+    # GET
+    resp = yield from client.get('/class_view')
+    assert resp.status == 200
+    text = yield from resp.text()
+    assert 'OK' in text   
+    # POST
+    resp = yield from client.post('/class_view')
+    assert resp.status == 200
+    text = yield from resp.text()
+    assert 'OK' in text
