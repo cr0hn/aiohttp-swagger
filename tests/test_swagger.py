@@ -26,6 +26,11 @@ def ping(request):
     return web.Response(text="pong")
 
 
+@asyncio.coroutine
+def undoc_ping(request):
+    return web.Response(text="pong")
+
+
 class ClassView(web.View):
     def _irrelevant_method(self):
         pass
@@ -61,6 +66,13 @@ class ClassView(web.View):
                 description: successful operation.
             "405":
                 description: invalid HTTP Method
+        """
+        return web.Response(text="OK")
+
+    @asyncio.coroutine
+    def patch(self):
+        """
+        This method is undocumented in the swagger sense.
         """
         return web.Response(text="OK")
 
@@ -204,6 +216,21 @@ def test_swagger_info(test_client, loop, swagger_info):
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
 
+
+@asyncio.coroutine
+def test_undocumented_fn(test_client, loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('GET', "/undoc_ping", undoc_ping)
+    setup_swagger(app)
+    client = yield from test_client(app)
+    resp = yield from client.get('/undoc_ping')
+    assert resp.status == 200
+    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert not result['paths']
+
 @asyncio.coroutine
 def test_class_view(test_client, loop):
     app = web.Application(loop=loop)
@@ -215,9 +242,33 @@ def test_class_view(test_client, loop):
     resp = yield from client.get('/class_view')
     assert resp.status == 200
     text = yield from resp.text()
-    assert 'OK' in text   
+    assert 'OK' in text
+    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/class_view" in result['paths']
+    assert "get" in result['paths']["/class_view"]
+    assert "post" in result['paths']["/class_view"]
+
     # POST
     resp = yield from client.post('/class_view')
     assert resp.status == 200
     text = yield from resp.text()
     assert 'OK' in text
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/class_view" in result['paths']
+    assert "get" in result['paths']["/class_view"]
+    assert "post" in result['paths']["/class_view"]
+
+    # Undocumented PATCH
+    resp = yield from client.patch('/class_view')
+    assert resp.status == 200
+    text = yield from resp.text()
+    assert 'OK' in text
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/class_view" in result['paths']
+    assert "patch" not in result['paths']["/class_view"]
+

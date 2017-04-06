@@ -47,7 +47,7 @@ def _build_doc_from_func_doc(route):
         }
         for method_name in method_names:
             method = getattr(route.handler, method_name)
-            if method.__doc__ is not None:
+            if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
                 out.update(_extract_swagger_docs(end_point_doc, method=method_name))
 
