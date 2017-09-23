@@ -90,11 +90,12 @@ def setup_swagger(app: web.Application,
     # --------------------------------------------------------------------------
     app["SWAGGER_DEF_CONTENT"] = swagger_info
     with open(join(STATIC_PATH, "index.html"), "r") as f:
+        bundle_params_str = json.dumps(bundle_params or {})
         app["SWAGGER_TEMPLATE_CONTENT"] = (
             f.read()
             .replace("##SWAGGER_CONFIG##", _swagger_def_url)
             .replace("##STATIC_PATH##", statics_path)
-            .replace("##BUNDLE_PARAMS##", bundle_params or [])
+            .replace("##BUNDLE_PARAMS##", bundle_params_str)
         )
 
 
