@@ -46,7 +46,8 @@ def setup_swagger(app: web.Application,
                   contact: str = "",
                   swagger_home_decor: FunctionType = None,
                   swagger_def_decor: FunctionType = None,
-                  swagger_info: dict = None):
+                  swagger_info: dict = None,
+                  bundle_params: dict = None):
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
                     else swagger_url)
@@ -93,6 +94,7 @@ def setup_swagger(app: web.Application,
             f.read()
             .replace("##SWAGGER_CONFIG##", _swagger_def_url)
             .replace("##STATIC_PATH##", statics_path)
+            .replace("##BUNDLE_PARAMS##", bundle_params or [])
         )
 
 
