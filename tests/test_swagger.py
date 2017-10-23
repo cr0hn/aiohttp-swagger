@@ -272,3 +272,25 @@ def test_class_view(test_client, loop):
     assert "/class_view" in result['paths']
     assert "patch" not in result['paths']["/class_view"]
 
+
+@asyncio.coroutine
+def test_sub_app(test_client, loop):
+    sub_app = web.Application(loop=loop)
+    sub_app.router.add_route('*', "/class_view", ClassView)
+    setup_swagger(sub_app, api_base_url='/sub_app')
+    app = web.Application(loop=loop)
+    app.add_subapp(prefix='/sub_app', subapp=sub_app)
+
+    client = yield from test_client(app)
+    # GET
+    resp = yield from client.get('/sub_app/class_view')
+    assert resp.status == 200
+    text = yield from resp.text()
+    assert 'OK' in text
+    swagger_resp1 = yield from client.get('/sub_app/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/class_view" in result['paths']
+    assert "get" in result['paths']["/class_view"]
+    assert "post" in result['paths']["/class_view"]
