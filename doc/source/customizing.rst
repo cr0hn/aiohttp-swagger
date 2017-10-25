@@ -167,3 +167,32 @@ Global Swagger YAML
     setup_swagger(app, swagger_from_file="example_swagger.yaml")  # <-- Loaded Swagger from external YAML file
 
     web.run_app(app, host="127.0.0.1")
+
+Nested applications
++++++++++++++++++++
+
+:samp:`aiohttp-swagger` is compatible with aiohttp `Nested applications <http://aiohttp.readthedocs.io/en/stable/web.html>`_ feature.
+In this case `api_base_url` argument of `setup_swagger` function should be the same as `prefix` argument of `add_subapp` method:
+
+
+.. code-block:: python
+
+    from aiohttp import web
+    from aiohttp_swagger import *
+
+    async def ping(request):
+        return web.Response(text="pong")
+
+    sub_app = web.Application()
+
+    sub_app.router.add_route('GET', "/ping", ping)
+
+    setup_swagger(sub_app,
+                  swagger_from_file="example_swagger.yaml",
+                  api_base_url='/sub_app_prefix')
+
+    app = web.Application()
+
+    app.add_subapp(prefix='/sub_app_prefix', subapp=sub_app)
+
+    web.run_app(app, host="127.0.0.1")
