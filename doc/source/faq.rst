@@ -52,7 +52,7 @@ Swagger has a tag that uses to build the titles. The tag name is :samp:`tags`. T
 
 .. code-block:: yaml
 
-    tags:  # <-- TAG USEF FOR THE TITLE
+    tags:  # <-- TAG USED FOR THE TITLE
     - Health check
     description: This end-point allow to test that service is up.
     produces:
