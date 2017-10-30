@@ -40,6 +40,7 @@ def setup_swagger(app: web.Application,
                   swagger_from_file: str = None,
                   swagger_url: str = "/api/doc",
                   api_base_url: str = "/",
+                  swagger_validator_url: str = "",
                   description: str = "Swagger API definition",
                   api_version: str = "1.0.0",
                   title: str = "Swagger API",
@@ -95,6 +96,7 @@ def setup_swagger(app: web.Application,
                      format(api_base_url.lstrip('/'), _swagger_def_url))
             .replace("##STATIC_PATH##", '/{}{}'.
                      format(api_base_url.lstrip('/'), statics_path))
+            .replace("##SWAGGER_VALIDATOR_URL##", swagger_validator_url)
         )
 
 
