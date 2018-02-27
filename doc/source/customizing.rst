@@ -169,8 +169,7 @@ Global Swagger YAML
     web.run_app(app, host="127.0.0.1")
 
 
-:samp:`aiohttp-swagger` also allow to build an external YAML Swagger file
-      and merge swagger endpoint definitions to it:
+:samp:`aiohttp-swagger` also allow to build an external YAML Swagger file and merge swagger endpoint definitions to it:
 
 .. code-block:: python
 
@@ -207,6 +206,62 @@ Global Swagger YAML
         app,
         swagger_from_file="example_swagger.yaml",   # <-- Loaded Swagger from external YAML file
         swagger_merge_with_file=True  # <-- Merge
+    )
+
+    web.run_app(app, host="127.0.0.1")
+
+
+:samp:`aiohttp-swagger` also allow to validate swagger schema against json schema:
+
+.. code-block:: python
+
+    from aiohttp import web
+    from aiohttp_swagger import *
+
+    @swagger_validation # <-- Mark for validation
+    async def ping(request):
+        """
+        ---
+        tags:
+        - user
+        summary: Create user
+        description: This can only be done by the logged in user.
+        operationId: examples.api.api.createUser
+        consumes:
+        - application/json
+        produces:
+        - application/json
+        parameters:
+        - in: body
+          name: body
+          description: Created user object
+          required: false
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              username:
+                type: string
+            required:
+              - id
+              - username
+        responses:
+          "201":
+            description: successful operation
+        """
+        return web.Response(text="pong")
+
+    app = web.Application()
+
+    app.router.add_route('GET', "/ping", ping)
+
+    setup_swagger(
+        app,
+        swagger_from_file="example_swagger.yaml",   # <-- Loaded Swagger from external YAML file
+        swagger_merge_with_file=True,  # <-- Merge
+        swagger_validate_schema=True   # <- Validate schema
     )
 
     web.run_app(app, host="127.0.0.1")

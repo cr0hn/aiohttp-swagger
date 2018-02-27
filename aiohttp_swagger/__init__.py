@@ -12,12 +12,20 @@ from .helpers import (
     generate_doc_from_each_end_point,
     load_doc_from_yaml_file,
     swagger_path,
+    swagger_validation,
+    add_swagger_validation,
 )
 
 try:
     import ujson as json
 except ImportError:
     import json
+
+__all__ = (
+    "setup_swagger",
+    "swagger_path",
+    "swagger_validation",
+)
 
 
 @asyncio.coroutine
@@ -89,7 +97,7 @@ def setup_swagger(app: web.Application,
             )
 
     if swagger_validate_schema:
-        pass
+        add_swagger_validation(app, swagger_info)
 
     swagger_info = json.dumps(swagger_info)
 
@@ -119,12 +127,9 @@ def setup_swagger(app: web.Application,
     with open(join(STATIC_PATH, "index.html"), "r") as f:
         app["SWAGGER_TEMPLATE_CONTENT"] = (
             f.read()
-            .replace("##SWAGGER_CONFIG##", '/{}{}'.
+            .replace("##SWAGGER_CONFIG##", '{}{}'.
                      format(api_base_url.lstrip('/'), _swagger_def_url))
-            .replace("##STATIC_PATH##", '/{}{}'.
+            .replace("##STATIC_PATH##", '{}{}'.
                      format(api_base_url.lstrip('/'), statics_path))
             .replace("##SWAGGER_VALIDATOR_URL##", swagger_validator_url)
         )
-
-
-__all__ = ("setup_swagger", "swagger_path")

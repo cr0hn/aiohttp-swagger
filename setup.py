@@ -31,7 +31,6 @@
 
 from os.path import dirname, join
 from setuptools import setup, find_packages
-from setuptools.command.test import test as TestCommand
 
 
 with open(join(dirname(__file__), 'requirements.txt')) as f:
@@ -43,15 +42,6 @@ with open(join(dirname(__file__), 'requirements-performance.txt')) as f:
 with open(join(dirname(__file__), 'README.md')) as f:
     long_description = f.read()
 
-
-class PyTest(TestCommand):
-    user_options = []
-
-    def run(self):
-        import subprocess
-        import sys
-        errno = subprocess.call([sys.executable, '-m', 'pytest', 'tests'])
-        raise SystemExit(errno)
 
 setup(
     name='aiohttp-swagger',
@@ -82,5 +72,5 @@ setup(
         'Topic :: Security',
     ],
     tests_require=['pytest', 'pytest-aiohttp'],
-    cmdclass=dict(test=PyTest)
+    setup_requires=['pytest-runner'],
 )
