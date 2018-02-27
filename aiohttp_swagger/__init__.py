@@ -1,11 +1,18 @@
 import asyncio
-from os.path import abspath, dirname, join
+from os.path import (
+    abspath,
+    dirname,
+    join,
+)
 from types import FunctionType
 
 from aiohttp import web
 
-from .helpers import (generate_doc_from_each_end_point,
-                      load_doc_from_yaml_file, swagger_path)
+from .helpers import (
+    generate_doc_from_each_end_point,
+    load_doc_from_yaml_file,
+    swagger_path,
+)
 
 try:
     import ujson as json
@@ -47,6 +54,8 @@ def setup_swagger(app: web.Application,
                   contact: str = "",
                   swagger_home_decor: FunctionType = None,
                   swagger_def_decor: FunctionType = None,
+                  swagger_merge_with_file: bool = False,
+                  swagger_validate_schema: bool = False,
                   swagger_info: dict = None):
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
@@ -54,17 +63,35 @@ def setup_swagger(app: web.Application,
     _base_swagger_url = _swagger_url.rstrip('/')
     _swagger_def_url = '{}/swagger.json'.format(_base_swagger_url)
 
-    # Build Swagget Info
+    # Build Swagger Info
     if swagger_info is None:
         if swagger_from_file:
             swagger_info = load_doc_from_yaml_file(swagger_from_file)
+            if swagger_merge_with_file:
+                swagger_end_points_info = generate_doc_from_each_end_point(
+                    app, api_base_url=api_base_url, description=description,
+                    api_version=api_version, title=title, contact=contact
+                )
+                paths = swagger_end_points_info.pop('paths', None)
+                swagger_info.update(swagger_end_points_info)
+                if paths is not None:
+                    if 'paths' not in swagger_info:
+                        swagger_info['paths'] = {}
+                    for ph, description in paths.items():
+                        for method, desc in description.items():
+                            if ph not in swagger_info['paths']:
+                                swagger_info['paths'][ph] = {}
+                            swagger_info['paths'][ph][method] = desc
         else:
             swagger_info = generate_doc_from_each_end_point(
                 app, api_base_url=api_base_url, description=description,
                 api_version=api_version, title=title, contact=contact
             )
-    else:
-        swagger_info = json.dumps(swagger_info)
+
+    if swagger_validate_schema:
+        pass
+
+    swagger_info = json.dumps(swagger_info)
 
     _swagger_home_func = _swagger_home
     _swagger_def_func = _swagger_def

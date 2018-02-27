@@ -1,5 +1,13 @@
+from typing import (
+    MutableMapping,
+    Mapping,
+)
 from collections import defaultdict
-from os.path import abspath, dirname, join
+from os.path import (
+    abspath,
+    dirname,
+    join,
+)
 
 import yaml
 from aiohttp import web
@@ -8,7 +16,7 @@ from jinja2 import Template
 
 try:
     import ujson as json
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     import json
 
 
@@ -36,28 +44,32 @@ def _extract_swagger_docs(end_point_doc, method="get"):
         }
     return {method: end_point_swagger_doc}
 
+
 def _build_doc_from_func_doc(route):
 
     out = {}
 
     if issubclass(route.handler, web.View) and route.method == METH_ANY:
         method_names = {
-            attr for attr in dir(route.handler) \
+            attr for attr in dir(route.handler)
             if attr.upper() in METH_ALL
         }
         for method_name in method_names:
             method = getattr(route.handler, method_name)
             if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
-                out.update(_extract_swagger_docs(end_point_doc, method=method_name))
+                out.update(
+                    _extract_swagger_docs(end_point_doc, method=method_name))
 
     else:
         try:
             end_point_doc = route.handler.__doc__.splitlines()
         except AttributeError:
             return {}
-        out.update(_extract_swagger_docs(end_point_doc))
+        out.update(_extract_swagger_docs(
+            end_point_doc, method=route.method.lower()))
     return out
+
 
 def generate_doc_from_each_end_point(
         app: web.Application,
@@ -66,7 +78,7 @@ def generate_doc_from_each_end_point(
         description: str = "Swagger API definition",
         api_version: str = "1.0.0",
         title: str = "Swagger API",
-        contact: str = ""):
+        contact: str = "") -> MutableMapping:
     # Clean description
     _start_desc = 0
     for i, word in enumerate(description):
@@ -91,8 +103,6 @@ def generate_doc_from_each_end_point(
     swagger["paths"] = defaultdict(dict)
 
     for route in app.router.routes():
-
-        end_point_doc = None
 
         # If route has a external link to doc, we use it, not function doc
         if getattr(route.handler, "swagger_file", False):
@@ -133,13 +143,14 @@ def generate_doc_from_each_end_point(
                 url = url_info.get("formatter")
 
             swagger["paths"][url].update(end_point_doc)
-
-    return json.dumps(swagger)
-
-
-def load_doc_from_yaml_file(doc_path: str):
-    loaded_yaml = yaml.load(open(doc_path, "r").read())
-    return json.dumps(loaded_yaml)
+    return swagger
 
 
-__all__ = ("generate_doc_from_each_end_point", "load_doc_from_yaml_file")
+def load_doc_from_yaml_file(doc_path: str) -> MutableMapping:
+    return yaml.load(open(doc_path, "r").read())
+
+
+__all__ = (
+    "generate_doc_from_each_end_point",
+    "load_doc_from_yaml_file"
+)

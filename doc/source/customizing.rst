@@ -168,6 +168,50 @@ Global Swagger YAML
 
     web.run_app(app, host="127.0.0.1")
 
+
+:samp:`aiohttp-swagger` also allow to build an external YAML Swagger file
+      and merge swagger endpoint definitions to it:
+
+.. code-block:: python
+
+    from aiohttp import web
+    from aiohttp_swagger import *
+
+    async def ping(request):
+        """
+        ---
+        tags:
+        - user
+        summary: Create user
+        description: This can only be done by the logged in user.
+        operationId: examples.api.api.createUser
+        produces:
+        - application/json
+        parameters:
+        - in: body
+          name: body
+          description: Created user object
+          required: false
+
+        responses:
+          "201":
+            description: successful operation
+        """
+        return web.Response(text="pong")
+
+    app = web.Application()
+
+    app.router.add_route('GET', "/ping", ping)
+
+    setup_swagger(
+        app,
+        swagger_from_file="example_swagger.yaml",   # <-- Loaded Swagger from external YAML file
+        swagger_merge_with_file=True  # <-- Merge
+    )
+
+    web.run_app(app, host="127.0.0.1")
+
+
 Nested applications
 +++++++++++++++++++
 
