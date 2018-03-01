@@ -212,6 +212,17 @@ Global Swagger YAML
 
 
 :samp:`aiohttp-swagger` also allow to validate swagger schema against json schema:
+Validated object would be added as **request.validation**. Default values also will be filled into object.
+
+.. code-block:: javascript
+
+    {
+        'query': {},    // validated request.query
+        'path': {},     // validated request.path
+        'body': {},     // validated request.json()
+        'formData': {}, // validated post request.data()
+        'headers': {},  // validated post request.headers
+    }
 
 .. code-block:: python
 
