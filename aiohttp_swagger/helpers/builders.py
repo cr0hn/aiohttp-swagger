@@ -138,7 +138,7 @@ def generate_doc_from_each_end_point(
 
 
 def load_doc_from_yaml_file(doc_path: str):
-    loaded_yaml = yaml.load(open(doc_path, "r").read())
+    loaded_yaml = yaml.load(open(doc_path, "r", encoding="utf-8").read())
     return json.dumps(loaded_yaml)
 
 
