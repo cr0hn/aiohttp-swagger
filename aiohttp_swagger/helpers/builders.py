@@ -1,22 +1,35 @@
+import logging
+from typing import (
+    MutableMapping,
+    Mapping,
+    TextIO,
+)
 from collections import defaultdict
-from os.path import abspath, dirname, join
+from os.path import (
+    abspath,
+    dirname,
+    join,
+)
 
 import yaml
 from aiohttp import web
 from aiohttp.hdrs import METH_ANY, METH_ALL
 from jinja2 import Template
-
 try:
     import ujson as json
-except ImportError: # pragma: no cover
+except ImportError:  # pragma: no cover
     import json
+
+from .validation import validate_decorator
 
 
 SWAGGER_TEMPLATE = abspath(join(dirname(__file__), "..", "templates"))
 
 
-def _extract_swagger_docs(end_point_doc, method="get"):
-    # Find Swagger start point in doc
+def _extract_swagger_docs(end_point_doc: str) -> Mapping:
+    """
+    Find Swagger start point in doc.
+    """
     end_point_swagger_start = 0
     for i, doc_line in enumerate(end_point_doc):
         if "---" in doc_line:
@@ -34,7 +47,8 @@ def _extract_swagger_docs(end_point_doc, method="get"):
                            "from docstring ⚠",
             "tags": ["Invalid Swagger"]
         }
-    return {method: end_point_swagger_doc}
+    return end_point_swagger_doc
+
 
 def _build_doc_from_func_doc(route):
 
@@ -42,22 +56,23 @@ def _build_doc_from_func_doc(route):
 
     if issubclass(route.handler, web.View) and route.method == METH_ANY:
         method_names = {
-            attr for attr in dir(route.handler) \
+            attr for attr in dir(route.handler)
             if attr.upper() in METH_ALL
         }
         for method_name in method_names:
             method = getattr(route.handler, method_name)
             if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
-                out.update(_extract_swagger_docs(end_point_doc, method=method_name))
+                out[method_name] = _extract_swagger_docs(end_point_doc)
 
     else:
         try:
             end_point_doc = route.handler.__doc__.splitlines()
         except AttributeError:
             return {}
-        out.update(_extract_swagger_docs(end_point_doc))
+        out[route.method.lower()] = _extract_swagger_docs(end_point_doc)
     return out
+
 
 def generate_doc_from_each_end_point(
         app: web.Application,
@@ -66,7 +81,7 @@ def generate_doc_from_each_end_point(
         description: str = "Swagger API definition",
         api_version: str = "1.0.0",
         title: str = "Swagger API",
-        contact: str = ""):
+        contact: str = "") -> MutableMapping:
     # Clean description
     _start_desc = 0
     for i, word in enumerate(description):
@@ -91,8 +106,6 @@ def generate_doc_from_each_end_point(
     swagger["paths"] = defaultdict(dict)
 
     for route in app.router.routes():
-
-        end_point_doc = None
 
         # If route has a external link to doc, we use it, not function doc
         if getattr(route.handler, "swagger_file", False):
@@ -133,13 +146,66 @@ def generate_doc_from_each_end_point(
                 url = url_info.get("formatter")
 
             swagger["paths"][url].update(end_point_doc)
-
-    return json.dumps(swagger)
-
-
-def load_doc_from_yaml_file(doc_path: str):
-    loaded_yaml = yaml.load(open(doc_path, "r").read())
-    return json.dumps(loaded_yaml)
+    return swagger
 
 
-__all__ = ("generate_doc_from_each_end_point", "load_doc_from_yaml_file")
+def load_doc_from_yaml_file(doc_path: str) -> MutableMapping:
+    return yaml.load(open(doc_path, "r").read())
+
+
+def load_doc_from_yaml_file_obj(doc: TextIO) -> MutableMapping:
+    return yaml.load(doc.read())
+
+
+def load_doc_from_yaml_str(doc: str) -> MutableMapping:
+    return yaml.load(doc)
+
+
+def add_swagger_validation(app, swagger_info: Mapping):
+    for route in app.router.routes():
+        method = route.method.lower()
+        handler = route.handler
+        url_info = route.get_info()
+        url = url_info.get('path') or url_info.get('formatter')
+
+        if method != '*':
+            swagger_endpoint_info_for_method = \
+                swagger_info['paths'].get(url, {}).get(method)
+            swagger_endpoint_info = \
+                {method: swagger_endpoint_info_for_method} if \
+                swagger_endpoint_info_for_method is not None else {}
+        else:
+            # all methods
+            swagger_endpoint_info = swagger_info['paths'].get(url, {})
+        for method, info in swagger_endpoint_info.items():
+            logging.debug(
+                'Added validation for method: {}. Path: {}'.
+                format(method.upper(), url)
+            )
+            if issubclass(handler, web.View) and route.method == METH_ANY:
+                # whole class validation
+                should_be_validated = getattr(handler, 'validation', False)
+                cls_method = getattr(handler, method, None)
+                if cls_method is not None:
+                    if not should_be_validated:
+                        # method validation
+                        should_be_validated = \
+                            getattr(handler, 'validation', False)
+                    if should_be_validated:
+                        new_cls_method = \
+                            validate_decorator(swagger_info, info)(cls_method)
+                        setattr(handler, method, new_cls_method)
+            else:
+                should_be_validated = getattr(handler, 'validation', False)
+                if should_be_validated:
+                    route._handler = \
+                        validate_decorator(swagger_info, info)(handler)
+
+
+__all__ = (
+    "generate_doc_from_each_end_point",
+    "load_doc_from_yaml_file",
+    "load_doc_from_yaml_str",
+    "load_doc_from_yaml_file_obj",
+    "add_swagger_validation",
+)

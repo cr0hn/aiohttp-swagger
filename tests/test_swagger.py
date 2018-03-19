@@ -1,15 +1,17 @@
 import asyncio
 import json
-import pytest
-import yaml
-from os.path import join, dirname, abspath
+from os.path import (
+    join,
+    dirname,
+    abspath,
+)
 
 from aiohttp import web
 from aiohttp_swagger import *
 
 
 @asyncio.coroutine
-def ping(request):
+def ping(_):
     """
     ---
     description: This end-point allow to test that service is up.
@@ -27,7 +29,7 @@ def ping(request):
 
 
 @asyncio.coroutine
-def undoc_ping(request):
+def undoc_ping(_):
     return web.Response(text="pong")
 
 
@@ -77,9 +79,49 @@ class ClassView(web.View):
         return web.Response(text="OK")
 
 
+class ClassViewWithSwaggerDoc(web.View):
+
+    def _irrelevant_method(self):
+        pass
+
+    @asyncio.coroutine
+    def get(self):
+        """
+        ---
+        description: Get resources
+        tags:
+        - Class View
+        produces:
+        - application/json
+        consumes:
+        - application/json
+        parameters:
+        - in: body
+          name: body
+          description: Created user object
+          required: false
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              username:
+                type:
+                  - "string"
+                  - "null"
+        responses:
+            "200":
+                description: successful operation.
+            "405":
+                description: invalid HTTP Method
+        """
+        return web.Response(text="OK")
+
+
 @swagger_path(abspath(join(dirname(__file__))) + '/data/partial_swagger.yaml')
 @asyncio.coroutine
-def ping_partial(request):
+def ping_partial(_):
     return web.Response(text="pong")
 
 
@@ -96,12 +138,9 @@ def test_ping(test_client, loop):
 
 
 @asyncio.coroutine
-def test_swagger_file_url(test_client, loop):
-    TESTS_PATH = abspath(join(dirname(__file__)))
-
+def test_swagger_file_url(test_client, loop, swagger_file):
     app = web.Application(loop=loop)
-    setup_swagger(app,
-                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
+    setup_swagger(app, swagger_from_file=swagger_file)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/doc/swagger.json')
@@ -192,17 +231,10 @@ def test_swagger_def_decorator(test_client, loop):
     assert 'Test Custom Title' in result['info']['title']
 
 
-@pytest.fixture
-def swagger_info():
-    filename = abspath(join(dirname(__file__))) + "/data/example_swagger.yaml"
-    return yaml.load(open(filename).read())
-
-
 @asyncio.coroutine
 def test_swagger_info(test_client, loop, swagger_info):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
-    description = "Test Custom Swagger"
     setup_swagger(app,
                   swagger_url="/api/v1/doc",
                   swagger_info=swagger_info)
@@ -230,6 +262,7 @@ def test_undocumented_fn(test_client, loop):
     text = yield from swagger_resp1.text()
     result = json.loads(text)
     assert not result['paths']
+
 
 @asyncio.coroutine
 def test_class_view(test_client, loop):
@@ -294,3 +327,50 @@ def test_sub_app(test_client, loop):
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
+
+
+@asyncio.coroutine
+def test_class_merge_swagger_view(test_client, loop, swagger_file):
+    app = web.Application(loop=loop)
+    app.router.add_route('*', "/example2", ClassViewWithSwaggerDoc)
+    setup_swagger(
+        app,
+        swagger_merge_with_file=True,
+        swagger_from_file=swagger_file,
+    )
+    client = yield from test_client(app)
+    resp = yield from client.get('/example2')
+    assert resp.status == 200
+    text = yield from resp.text()
+    assert 'OK' in text
+    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/example2" in result['paths']
+    assert "get" in result['paths']["/example2"]
+    assert result['paths']["/example2"]["get"]["parameters"][0]["schema"][
+        "properties"]["id"]["type"] == "integer"
+
+
+@asyncio.coroutine
+def test_class_no_merge_swagger_view(test_client, loop, swagger_file):
+    app = web.Application(loop=loop)
+    app.router.add_route('*', "/example2", ClassViewWithSwaggerDoc)
+    setup_swagger(
+        app,
+        swagger_merge_with_file=False,
+        swagger_from_file=swagger_file,
+    )
+    client = yield from test_client(app)
+    resp = yield from client.get('/example2')
+    assert resp.status == 200
+    text = yield from resp.text()
+    assert 'OK' in text
+    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/example2" in result['paths']
+    assert "get" in result['paths']["/example2"]
+    assert "schema" not in result['paths']["/example2"]["get"]["parameters"][0]
