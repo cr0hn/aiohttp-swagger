@@ -11,6 +11,7 @@ from aiohttp import web
 from .helpers import (
     generate_doc_from_each_end_point,
     load_doc_from_yaml_file,
+    load_doc_from_yaml_str,
     swagger_path,
     swagger_validation,
     add_swagger_validation,
@@ -53,6 +54,7 @@ STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
 def setup_swagger(app: web.Application,
                   *,
                   swagger_from_file: str = None,
+                  swagger_from_str: str = None,
                   swagger_url: str = "/api/doc",
                   api_base_url: str = "/",
                   swagger_validator_url: str = "",
@@ -73,8 +75,11 @@ def setup_swagger(app: web.Application,
 
     # Build Swagger Info
     if swagger_info is None:
-        if swagger_from_file:
-            swagger_info = load_doc_from_yaml_file(swagger_from_file)
+        if swagger_from_file or swagger_from_str:
+            if swagger_from_file:
+                swagger_info = load_doc_from_yaml_file(swagger_from_file)
+            elif swagger_from_str:
+                swagger_info = load_doc_from_yaml_str(swagger_from_str)
             if swagger_merge_with_file:
                 swagger_end_points_info = generate_doc_from_each_end_point(
                     app, api_base_url=api_base_url, description=description,

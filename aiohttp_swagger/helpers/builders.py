@@ -2,6 +2,7 @@ import logging
 from typing import (
     MutableMapping,
     Mapping,
+    TextIO,
 )
 from collections import defaultdict
 from os.path import (
@@ -152,6 +153,14 @@ def load_doc_from_yaml_file(doc_path: str) -> MutableMapping:
     return yaml.load(open(doc_path, "r").read())
 
 
+def load_doc_from_yaml_file_obj(doc: TextIO) -> MutableMapping:
+    return yaml.load(doc.read())
+
+
+def load_doc_from_yaml_str(doc: str) -> MutableMapping:
+    return yaml.load(doc)
+
+
 def add_swagger_validation(app, swagger_info: Mapping):
     for route in app.router.routes():
         method = route.method.lower()
@@ -196,5 +205,7 @@ def add_swagger_validation(app, swagger_info: Mapping):
 __all__ = (
     "generate_doc_from_each_end_point",
     "load_doc_from_yaml_file",
+    "load_doc_from_yaml_str",
+    "load_doc_from_yaml_file_obj",
     "add_swagger_validation",
 )

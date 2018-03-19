@@ -21,7 +21,7 @@ from aiohttp.web import (
     Response,
     json_response,
 )
-from collections import defaultdict, MutableMapping
+from collections import MutableMapping
 from jsonschema import (
     ValidationError,
     FormatChecker,
@@ -204,8 +204,8 @@ def validation_exc_to_dict(exc, code=400):
 
 def dereference_schema(swagger: Mapping, schema: Any, current_ref=None) -> Any:
 
-    def get_ref(ref: str):
-        path = filter(None, ref.lstrip('#').split('/'))
+    def get_ref(_ref: str):
+        path = filter(None, _ref.lstrip('#').split('/'))
         return reduce(dict.__getitem__, path, swagger)
 
     if isinstance(schema, dict):
