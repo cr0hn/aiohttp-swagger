@@ -46,7 +46,8 @@ def setup_swagger(app: web.Application,
                   contact: str = "",
                   swagger_home_decor: FunctionType = None,
                   swagger_def_decor: FunctionType = None,
-                  swagger_info: dict = None):
+                  swagger_info: dict = None,
+                  json_only: bool = False):
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
                     else swagger_url)
@@ -75,10 +76,16 @@ def setup_swagger(app: web.Application,
         _swagger_def_func = swagger_def_decor(_swagger_def)
 
     # Add API routes
+    app.router.add_route('GET', _swagger_def_url, _swagger_def_func)
+
+    app["SWAGGER_DEF_CONTENT"] = swagger_info
+
+    if json_only:
+        return
+
     app.router.add_route('GET', _swagger_url, _swagger_home_func)
     app.router.add_route('GET', "{}/".format(_base_swagger_url),
                          _swagger_home_func)
-    app.router.add_route('GET', _swagger_def_url, _swagger_def_func)
 
     # Set statics
     statics_path = '{}/swagger_static'.format(_base_swagger_url)
@@ -87,7 +94,6 @@ def setup_swagger(app: web.Application,
     # --------------------------------------------------------------------------
     # Build templates
     # --------------------------------------------------------------------------
-    app["SWAGGER_DEF_CONTENT"] = swagger_info
     with open(join(STATIC_PATH, "index.html"), "r") as f:
         app["SWAGGER_TEMPLATE_CONTENT"] = (
             f.read()
