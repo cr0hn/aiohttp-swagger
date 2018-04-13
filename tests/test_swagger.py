@@ -1,5 +1,6 @@
 import asyncio
 import json
+import pathlib
 import pytest
 import yaml
 from os.path import join, dirname, abspath
@@ -101,7 +102,8 @@ def test_swagger_file_url(test_client, loop):
 
     app = web.Application(loop=loop)
     setup_swagger(app,
-                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
+                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml",
+                  json_only=True)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/doc/swagger.json')
@@ -117,7 +119,7 @@ def test_swagger_file_url(test_client, loop):
 def test_partial_swagger_file(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping-partial", ping_partial)
-    setup_swagger(app)
+    setup_swagger(app, json_only=True)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/doc/swagger.json')
@@ -137,7 +139,8 @@ def test_custom_swagger(test_client, loop):
                   description=description,
                   title="Test Custom Title",
                   api_version="1.0.0",
-                  contact="my.custom.contact@example.com")
+                  contact="my.custom.contact@example.com",
+                  json_only=True)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
@@ -159,7 +162,8 @@ def test_swagger_home_decorator(test_client, loop):
                   title="Test Custom Title",
                   api_version="1.0.0",
                   contact="my.custom.contact@example.com",
-                  swagger_home_decor=lambda x: x)
+                  swagger_home_decor=lambda x: x,
+                  json_only=True)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
@@ -181,7 +185,8 @@ def test_swagger_def_decorator(test_client, loop):
                   title="Test Custom Title",
                   api_version="1.0.0",
                   contact="my.custom.contact@example.com",
-                  swagger_def_decor=lambda x: x)
+                  swagger_def_decor=lambda x: x,
+                  json_only=True)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
@@ -205,7 +210,8 @@ def test_swagger_info(test_client, loop, swagger_info):
     description = "Test Custom Swagger"
     setup_swagger(app,
                   swagger_url="/api/v1/doc",
-                  swagger_info=swagger_info)
+                  swagger_info=swagger_info,
+                  json_only=True)
 
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
@@ -221,7 +227,7 @@ def test_swagger_info(test_client, loop, swagger_info):
 def test_undocumented_fn(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/undoc_ping", undoc_ping)
-    setup_swagger(app)
+    setup_swagger(app, json_only=True)
     client = yield from test_client(app)
     resp = yield from client.get('/undoc_ping')
     assert resp.status == 200
@@ -235,7 +241,7 @@ def test_undocumented_fn(test_client, loop):
 def test_class_view(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('*', "/class_view", ClassView)
-    setup_swagger(app)
+    setup_swagger(app, json_only=True)
 
     client = yield from test_client(app)
     # GET
@@ -277,7 +283,7 @@ def test_class_view(test_client, loop):
 def test_sub_app(test_client, loop):
     sub_app = web.Application(loop=loop)
     sub_app.router.add_route('*', "/class_view", ClassView)
-    setup_swagger(sub_app, api_base_url='/sub_app')
+    setup_swagger(sub_app, api_base_url='/sub_app', json_only=True)
     app = web.Application(loop=loop)
     app.add_subapp(prefix='/sub_app', subapp=sub_app)
 
@@ -294,3 +300,22 @@ def test_sub_app(test_client, loop):
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
+
+
+@asyncio.coroutine
+def test_swagger_defined_paths(test_client, loop):
+    app1 = web.Application(loop=loop)
+    setup_swagger(app1, json_only=True)
+    urls1 = [r.get_info() for r in app1.router.resources()]
+    assert urls1 == [{'path': '/api/doc/swagger.json'}]
+
+    app2 = web.Application(loop=loop)
+    setup_swagger(app2)
+    urls2 = [r.get_info() for r in app2.router.resources()]
+    assert urls2 == [
+        {'path': '/api/doc/swagger.json'},
+        {'path': '/api/doc'},
+        {'path': '/api/doc/'},
+        {'directory': pathlib.Path('aiohttp_swagger/swagger_ui').absolute(),
+         'prefix': '/api/doc/swagger_static'},
+    ]
