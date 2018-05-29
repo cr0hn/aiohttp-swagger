@@ -47,9 +47,8 @@ def setup_swagger(app: web.Application,
                   swagger_home_decor: FunctionType = None,
                   swagger_def_decor: FunctionType = None,
                   swagger_info: dict = None):
-    _swagger_url = ("/{}".format(swagger_url)
-                    if not swagger_url.startswith("/")
-                    else swagger_url)
+    _api_base_url = "/{}".format(api_base_url.lstrip('/'))
+    _swagger_url = "/{}".format(swagger_url.lstrip('/'))
     _base_swagger_url = _swagger_url.rstrip('/')
     _swagger_def_url = '{}/swagger.json'.format(_base_swagger_url)
 
@@ -59,7 +58,7 @@ def setup_swagger(app: web.Application,
             swagger_info = load_doc_from_yaml_file(swagger_from_file)
         else:
             swagger_info = generate_doc_from_each_end_point(
-                app, api_base_url=api_base_url, description=description,
+                app, api_base_url=_api_base_url, description=description,
                 api_version=api_version, title=title, contact=contact
             )
     else:
@@ -91,10 +90,14 @@ def setup_swagger(app: web.Application,
     with open(join(STATIC_PATH, "index.html"), "r") as f:
         app["SWAGGER_TEMPLATE_CONTENT"] = (
             f.read()
-            .replace("##SWAGGER_CONFIG##", '/{}{}'.
-                     format(api_base_url.lstrip('/'), _swagger_def_url))
-            .replace("##STATIC_PATH##", '/{}{}'.
-                     format(api_base_url.lstrip('/'), statics_path))
+            .replace(
+                "##SWAGGER_CONFIG##",
+                '{}{}'.format(_api_base_url.rstrip('/'), _swagger_def_url)
+            )
+            .replace(
+                "##STATIC_PATH##",
+                '{}{}'.format(_api_base_url.rstrip('/'), statics_path)
+            )
         )
 
 
