@@ -50,6 +50,9 @@ def setup_swagger(app: web.Application,
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
                     else swagger_url)
+    _api_base_url = ("/{}".format(swagger_url)
+                    if not swagger_url.startswith("/")
+                    else swagger_url)
     _base_swagger_url = _swagger_url.rstrip('/')
     _swagger_def_url = '{}/swagger.json'.format(_base_swagger_url)
 
@@ -81,7 +84,10 @@ def setup_swagger(app: web.Application,
     app.router.add_route('GET', _swagger_def_url, _swagger_def_func)
 
     # Set statics
-    statics_path = '{}/swagger_static'.format(_base_swagger_url)
+    if api_base_url:
+        statics_path = '{}{}/swagger_static'.format(api_base_url.rstrip('/'), _base_swagger_url)
+    else:
+        statics_path = '{}/swagger_static'.format(_base_swagger_url)
     app.router.add_static(statics_path, STATIC_PATH)
 
     # --------------------------------------------------------------------------
