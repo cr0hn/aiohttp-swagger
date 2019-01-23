@@ -4,7 +4,7 @@ from os.path import abspath, dirname, join
 import yaml
 from aiohttp import web
 from aiohttp.hdrs import METH_ANY, METH_ALL
-from jinja2 import Template
+from jinja2 import Environment, BaseLoader
 
 try:
     import ujson as json
@@ -68,7 +68,8 @@ def generate_doc_from_each_end_point(
         description: str = "Swagger API definition",
         api_version: str = "1.0.0",
         title: str = "Swagger API",
-        contact: str = ""):
+        contact: str = "",
+        security_definitions: dict = None):
     # Clean description
     _start_desc = 0
     for i, word in enumerate(description):
@@ -77,15 +78,28 @@ def generate_doc_from_each_end_point(
             break
     cleaned_description = "    ".join(description[_start_desc:].splitlines())
 
+    def nesteddict2yaml(d, indent=10, result=""):
+        for key, value in d.items():
+            result += " " * indent + str(key) + ':'
+            if isinstance(value, dict):
+                result = nesteddict2yaml(value, indent + 2, result + "\n")
+            else:
+                result += " " + str(value) + "\n"
+        return result
+
     # Load base Swagger template
+    jinja2_env = Environment(loader=BaseLoader())
+    jinja2_env.filters['nesteddict2yaml'] = nesteddict2yaml
+
     with open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r") as f:
         swagger_base = (
-            Template(f.read()).render(
+            jinja2_env.from_string(f.read()).render(
                 description=cleaned_description,
                 version=api_version,
                 title=title,
                 contact=contact,
-                base_path=api_base_url)
+                base_path=api_base_url,
+                security_definitions=security_definitions)
         )
 
     # The Swagger OBJ
