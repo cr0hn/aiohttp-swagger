@@ -4,9 +4,9 @@
   <head>
     <meta charset="UTF-8">
     <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="./swagger-ui.css" >
-    <link rel="icon" type="image/png" href="./favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="./favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="##STATIC_PATH##/swagger-ui.css" >
+    <link rel="icon" type="image/png" href="##STATIC_PATH##/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="##STATIC_PATH##/favicon-16x16.png" sizes="16x16" />
     <style>
       html
       {
@@ -33,13 +33,21 @@
   <body>
     <div id="swagger-ui"></div>
 
-    <script src="./swagger-ui-bundle.js"> </script>
-    <script src="./swagger-ui-standalone-preset.js"> </script>
+    <script src="##STATIC_PATH##/swagger-ui-bundle.js"> </script>
+    <script src="##STATIC_PATH##/swagger-ui-standalone-preset.js"> </script>
     <script>
     window.onload = function() {
+
+      let url = window.location.search.match(/url=([^&]+)/);
+      if (url && url.length > 1) {
+        url = decodeURIComponent(url[1]);
+      } else {
+        url = "##SWAGGER_CONFIG##";
+      }
+
       // Begin Swagger UI call region
-      const ui = SwaggerUIBundle({
-        url: "https://petstore.swagger.io/v2/swagger.json",
+      const params = Object.assign({
+        url: url,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -50,8 +58,10 @@
           SwaggerUIBundle.plugins.DownloadUrl
         ],
         layout: "StandaloneLayout"
-      })
+      }, ##BUNDLE_PARAMS##)
       // End Swagger UI call region
+
+      const ui = SwaggerUIBundle(params);
 
       window.ui = ui
     }
