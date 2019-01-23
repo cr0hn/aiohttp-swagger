@@ -56,7 +56,9 @@ def _build_doc_from_func_doc(route):
             end_point_doc = route.handler.__doc__.splitlines()
         except AttributeError:
             return {}
-        out.update(_extract_swagger_docs(end_point_doc))
+
+        method_name = route.method.lower()
+        out.update(_extract_swagger_docs(end_point_doc, method=method_name))
     return out
 
 def generate_doc_from_each_end_point(
