@@ -28,16 +28,16 @@ Index
 Examples
 --------
 
-If you need more examples, there're some available in at folder: `aiohttp_swagger/examples <https://github.com/cr0hn/aiohttp-swagger/tree/master/examples>`_.
+If you need more examples, there are some in this folder: `aiohttp_swagger/examples <https://github.com/cr0hn/aiohttp-swagger/tree/master/examples>`_.
 
 What's new?
 -----------
 
 You can read entire list in `CHANGELOG <https://github.com/cr0hn/aiohttp-swagger/blob/master/CHANGELOG>`_ file.
 
-Collaborate
------------
+Contributing
+------------
 
-You can to collaborate? Nice! You're welcome :)
+You want to collaborate on this project? Nice! Your contribution is very welcome :)
 
-You can collaborate sending me a GitHub Pull Request with your proposal.
+You can send me a GitHub Pull Request with your proposal.
