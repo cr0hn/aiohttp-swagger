@@ -1,7 +1,7 @@
 aiohttp-swagger
 ===============
 
-**LOCKING FOR MAINTAINERS**!!!!!
+**LOOCKING FOR MAINTAINERS**!!!!!
 
 ![Logo](doc/source/_static/logo.png)
 
