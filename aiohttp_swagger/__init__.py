@@ -48,7 +48,8 @@ def setup_swagger(app: web.Application,
                   swagger_def_decor: FunctionType = None,
                   swagger_info: dict = None,
                   bundle_params: dict = None,
-                  security_definitions: dict = None):
+                  security_definitions: dict = None,
+                  definitions: str = None):
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
                     else swagger_url)
@@ -64,6 +65,7 @@ def setup_swagger(app: web.Application,
                 app, api_base_url=api_base_url, description=description,
                 api_version=api_version, title=title, contact=contact,
                 security_definitions=security_definitions,
+                definitions=definitions,
             )
     else:
         swagger_info = json.dumps(swagger_info)
