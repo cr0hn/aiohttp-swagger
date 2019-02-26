@@ -6,6 +6,8 @@ from os.path import join, dirname, abspath
 
 from aiohttp import web
 from aiohttp_swagger import *
+from aiohttp.pytest_plugin import test_client
+from aiohttp.test_utils import loop_context
 
 
 @asyncio.coroutine
@@ -24,6 +26,12 @@ def ping(request):
             description: invalid HTTP Method
     """
     return web.Response(text="pong")
+
+
+@pytest.fixture
+def loop():
+    with loop_context() as loop:
+        yield loop
 
 
 @asyncio.coroutine

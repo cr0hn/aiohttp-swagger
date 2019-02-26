@@ -16,4 +16,7 @@ schemes:
 securityDefinitions:
 {{ security_definitions|nesteddict2yaml }}
 {% endif %}
+{% if definitions %}
+{{ definitions }}
+{% endif %}
 paths:
