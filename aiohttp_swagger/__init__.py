@@ -1,4 +1,5 @@
 import asyncio
+import re
 from os.path import abspath, dirname, join
 from types import FunctionType
 
@@ -91,12 +92,14 @@ def setup_swagger(app: web.Application,
     # --------------------------------------------------------------------------
     app["SWAGGER_DEF_CONTENT"] = swagger_info
     with open(join(STATIC_PATH, "index.html"), "r") as f:
+        SWAGGER_CONFIG_STR = '/{}{}'.format(api_base_url, _swagger_def_url)
+        SWAGGER_CONFIG_STR = re.sub(r'/+', '/', SWAGGER_CONFIG_STR)
+        STATIC_PATH_STR = '/{}{}'.format(api_base_url, statics_path)
+        STATIC_PATH_STR = re.sub(r'/+', '/', STATIC_PATH_STR)
         app["SWAGGER_TEMPLATE_CONTENT"] = (
             f.read()
-            .replace("##SWAGGER_CONFIG##", '/{}{}'.
-                     format(api_base_url.lstrip('/'), _swagger_def_url))
-            .replace("##STATIC_PATH##", '/{}{}'.
-                     format(api_base_url.lstrip('/'), statics_path))
+            .replace("##SWAGGER_CONFIG##", SWAGGER_CONFIG_STR)
+            .replace("##STATIC_PATH##", STATIC_PATH_STR)
         )
 
 
