@@ -50,8 +50,6 @@ async def users_with_data_def(request):
 
 
 class ClassView(web.View):
-    def _irrelevant_method(self):
-        pass
 
     async def get(self):
         """
@@ -93,9 +91,6 @@ class ClassView(web.View):
 
 
 class ClassViewWithSwaggerDoc(web.View):
-
-    def _irrelevant_method(self):
-        pass
 
     async def get(self):
         """
@@ -186,7 +181,6 @@ async def test_swagger_ui3(test_client, loop):
 
 
 async def test_swagger_file_url(test_client, loop, swagger_file):
-    TESTS_PATH = abspath(join(dirname(__file__)))
     app = web.Application(loop=loop)
     setup_swagger(app, swagger_from_file=swagger_file)
     client = await test_client(app)

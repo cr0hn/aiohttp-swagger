@@ -6,9 +6,8 @@ from aiohttp import web
 from aiohttp_swagger import *
 
 
-@asyncio.coroutine
 @swagger_validation
-def post(request, *args, **kwargs):
+async def post(request, *args, **kwargs):
     """
     ---
     description: Post User data
@@ -55,8 +54,7 @@ METHOD_PARAMETERS = [
 
 
 @pytest.mark.parametrize("method,url,body,headers,response", METHOD_PARAMETERS)
-@asyncio.coroutine
-def test_function_post_with_swagger_ref(
+async def test_function_post_with_swagger_ref(
         test_client, loop, swagger_ref_file,
         method, url, body, headers, response):
     app = web.Application(loop=loop)
@@ -67,11 +65,11 @@ def test_function_post_with_swagger_ref(
         swagger_validate_schema=True,
         swagger_from_file=swagger_ref_file,
     )
-    client = yield from test_client(app)
+    client = await test_client(app)
     data = json.dumps(body) \
         if headers['Content-Type'] == 'application/json' else body
-    resp = yield from getattr(client, method)(url, data=data, headers=headers)
-    text = yield from resp.text()
+    resp = await getattr(client, method)(url, data=data, headers=headers)
+    text = await resp.text()
     assert resp.status == response, text
     if response != 200:
         assert 'error' in text
