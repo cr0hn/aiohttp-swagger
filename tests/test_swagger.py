@@ -185,7 +185,7 @@ async def test_swagger_ui3(test_client, loop):
     assert retrieved == loaded
 
 
-async def test_swagger_file_url(test_client, loop):
+async def test_swagger_file_url(test_client, loop, swagger_file):
     TESTS_PATH = abspath(join(dirname(__file__)))
     app = web.Application(loop=loop)
     setup_swagger(app, swagger_from_file=swagger_file)

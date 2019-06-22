@@ -23,7 +23,7 @@ from .validation import validate_decorator
 SWAGGER_TEMPLATE = abspath(join(dirname(__file__), "..", "templates"))
 
 
-def _extract_swagger_docs(end_point_doc: str) -> Mapping:
+def _extract_swagger_docs(end_point_doc: str, method: str = 'get') -> Mapping:
     """
     Find Swagger start point in doc.
     """
@@ -44,8 +44,7 @@ def _extract_swagger_docs(end_point_doc: str) -> Mapping:
                            "from docstring ⚠",
             "tags": ["Invalid Swagger"]
         }
-    return end_point_swagger_doc
-
+    return {method: end_point_swagger_doc}
 
 
 def _build_doc_from_func_doc(route):
@@ -61,7 +60,7 @@ def _build_doc_from_func_doc(route):
             method = getattr(route.handler, method_name)
             if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
-                out[method_name] = _extract_swagger_docs(end_point_doc)
+                out.update(_extract_swagger_docs(end_point_doc, method=method_name))
 
     else:
         try:
@@ -69,7 +68,6 @@ def _build_doc_from_func_doc(route):
         except AttributeError:
             return {}
         out.update(_extract_swagger_docs(end_point_doc, method=str(route.method).lower()))
-        # TODO CHECK out[route.method.lower()] = _extract_swagger_docs(end_point_doc)
     return out
 
 
@@ -177,14 +175,15 @@ def generate_doc_from_each_end_point(
 def load_doc_from_yaml_file(doc_path: str) -> MutableMapping:
     with open(doc_path, "r") as f:
         loaded_yaml = yaml.full_load(f.read())
-        return json.dumps(loaded_yaml)
+        return loaded_yaml
 
 
 def load_doc_from_yaml_str(doc: str) -> MutableMapping:
-    return yaml.load(doc)
+    return yaml.full_load(doc)
+
 
 def load_doc_from_yaml_file_obj(doc: TextIO) -> MutableMapping:
-    return yaml.load(doc.read())
+    return yaml.full_load(doc.read())
 
 
 def add_swagger_validation(app, swagger_info: Mapping):

@@ -12,8 +12,7 @@ class ClassViewWithSwaggerDoc(web.View):
     def _irrelevant_method(self):
         pass
 
-    @asyncio.coroutine
-    def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
         """
         ---
         description: Get resources
@@ -77,8 +76,7 @@ class ClassViewWithSwaggerDoc(web.View):
         """
         return web.Response(text="OK")
 
-    @asyncio.coroutine
-    def post(self, *args, **kwargs):
+    async def post(self, *args, **kwargs):
         """
         ---
         description: Post resources
@@ -136,9 +134,8 @@ class ClassViewWithSwaggerDoc(web.View):
         return web.Response(text="OK")
 
 
-@asyncio.coroutine
 @swagger_validation
-def get(request, *args, **kwargs):
+async def get(request, *args, **kwargs):
     """
     ---
     description: Get resources
@@ -202,9 +199,8 @@ def get(request, *args, **kwargs):
     return web.Response(text="OK")
 
 
-@asyncio.coroutine
 @swagger_validation
-def post(request, *args, **kwargs):
+async def post(request, *args, **kwargs):
     """
     ---
     description: Post resources
@@ -262,9 +258,8 @@ def post(request, *args, **kwargs):
     return web.Response(text="OK")
 
 
-@asyncio.coroutine
 @swagger_validation(True)
-def get_turn_on_validation(request, *args, **kwargs):
+async def get_turn_on_validation(request, *args, **kwargs):
     """
     ---
     description: Test validation
@@ -291,9 +286,8 @@ def get_turn_on_validation(request, *args, **kwargs):
     return web.Response(text="OK")
 
 
-@asyncio.coroutine
 @swagger_validation(False)
-def get_turn_off_validation(request, *args, **kwargs):
+async def get_turn_off_validation(request, *args, **kwargs):
     """
     ---
     description: Test validation
@@ -484,8 +478,7 @@ ALL_METHODS_PARAMETERS = GET_METHOD_PARAMETERS + POST_METHOD_PARAMETERS
 
 @pytest.mark.parametrize("method,url,body,headers,response",
                          ALL_METHODS_PARAMETERS)
-@asyncio.coroutine
-def test_class_swagger_view_validation(test_client, loop, swagger_file,
+async def test_class_swagger_view_validation(test_client, loop, swagger_file,
                                        method, url, body, headers, response):
     app = web.Application(loop=loop)
     app.router.add_route('*', "/example2/{user_id}", ClassViewWithSwaggerDoc)
@@ -495,11 +488,11 @@ def test_class_swagger_view_validation(test_client, loop, swagger_file,
         swagger_validate_schema=True,
         swagger_from_file=swagger_file,
     )
-    client = yield from test_client(app)
+    client = await test_client(app)
     data = json.dumps(body) \
         if headers['Content-Type'] == 'application/json' else body
-    resp = yield from getattr(client, method)(url, data=data, headers=headers)
-    text = yield from resp.text()
+    resp = await getattr(client, method)(url, data=data, headers=headers)
+    text = await resp.text()
     assert resp.status == response, text
     if response != 200:
         assert 'error' in text
@@ -509,8 +502,7 @@ def test_class_swagger_view_validation(test_client, loop, swagger_file,
 
 @pytest.mark.parametrize("method,url,body,headers,response",
                          GET_METHOD_PARAMETERS)
-@asyncio.coroutine
-def test_function_get_method_swagger_view_validation(
+async def test_function_get_method_swagger_view_validation(
         test_client, loop, swagger_file, method, url, body, headers, response):
     app = web.Application(loop=loop)
     app.router.add_get("/example2/{user_id}", get)
@@ -520,11 +512,11 @@ def test_function_get_method_swagger_view_validation(
         swagger_validate_schema=True,
         swagger_from_file=swagger_file,
     )
-    client = yield from test_client(app)
+    client = await test_client(app)
     data = json.dumps(body) \
         if headers['Content-Type'] == 'application/json' else body
-    resp = yield from getattr(client, method)(url, data=data, headers=headers)
-    text = yield from resp.text()
+    resp = await getattr(client, method)(url, data=data, headers=headers)
+    text = await resp.text()
     assert resp.status == response, text
     if response != 200:
         assert 'error' in text
@@ -534,8 +526,7 @@ def test_function_get_method_swagger_view_validation(
 
 @pytest.mark.parametrize("method,url,body,headers,response",
                          POST_METHOD_PARAMETERS)
-@asyncio.coroutine
-def test_function_post_method_swagger_view_validation(
+async def test_function_post_method_swagger_view_validation(
         test_client, loop, swagger_file, method, url, body, headers, response):
     app = web.Application(loop=loop)
     app.router.add_post("/example2/{user_id}", post)
@@ -545,11 +536,11 @@ def test_function_post_method_swagger_view_validation(
         swagger_validate_schema=True,
         swagger_from_file=swagger_file,
     )
-    client = yield from test_client(app)
+    client = await test_client(app)
     data = json.dumps(body) \
         if headers['Content-Type'] == 'application/json' else body
-    resp = yield from getattr(client, method)(url, data=data, headers=headers)
-    text = yield from resp.text()
+    resp = await getattr(client, method)(url, data=data, headers=headers)
+    text = await resp.text()
     assert resp.status == response, text
     if response != 200:
         assert 'error' in text
@@ -579,8 +570,7 @@ def test_function_post_method_swagger_view_validation(
             400
     ),
 ])
-@asyncio.coroutine
-def test_function_get_turn_on_validation(
+async def test_function_get_turn_on_validation(
         test_client, loop, swagger_file, method, url, headers, response):
     app = web.Application(loop=loop)
     app.router.add_get("/example2/{user_id}", get_turn_on_validation)
@@ -590,9 +580,9 @@ def test_function_get_turn_on_validation(
         swagger_validate_schema=True,
         swagger_from_file=swagger_file,
     )
-    client = yield from test_client(app)
-    resp = yield from getattr(client, method)(url, headers=headers)
-    text = yield from resp.text()
+    client = await test_client(app)
+    resp = await getattr(client, method)(url, headers=headers)
+    text = await resp.text()
     assert resp.status == response, text
     if response != 200:
         assert 'error' in text
@@ -622,8 +612,7 @@ def test_function_get_turn_on_validation(
             200
     ),
 ])
-@asyncio.coroutine
-def test_function_get_turn_off_validation(
+async def test_function_get_turn_off_validation(
         test_client, loop, swagger_file, method, url, headers, response):
     app = web.Application(loop=loop)
     app.router.add_get("/example2/{user_id}", get_turn_off_validation)
@@ -633,9 +622,9 @@ def test_function_get_turn_off_validation(
         swagger_validate_schema=True,
         swagger_from_file=swagger_file,
     )
-    client = yield from test_client(app)
-    resp = yield from getattr(client, method)(url, headers=headers)
-    text = yield from resp.text()
+    client = await test_client(app)
+    resp = await getattr(client, method)(url, headers=headers)
+    text = await resp.text()
     assert resp.status == response, text
     if response != 200:
         assert 'error' in text
@@ -643,8 +632,7 @@ def test_function_get_turn_off_validation(
         assert 'error' not in text
 
 
-@asyncio.coroutine
-def test_validate_swagger_ui(test_client, loop, swagger_file):
+async def test_validate_swagger_ui(test_client, loop, swagger_file):
     app = web.Application(loop=loop)
     app.router.add_route('*', "/example2/{user_id}", ClassViewWithSwaggerDoc)
     setup_swagger(
@@ -654,8 +642,8 @@ def test_validate_swagger_ui(test_client, loop, swagger_file):
         swagger_from_file=swagger_file,
         swagger_validator_url='//online.swagger.io/validator',
     )
-    client = yield from test_client(app)
-    swagger_resp = yield from client.get('/api/doc')
+    client = await test_client(app)
+    swagger_resp = await client.get('/api/doc')
     assert swagger_resp.status == 200
-    text = yield from swagger_resp.text()
+    text = await swagger_resp.text()
     assert 'online.swagger.io/validator' in text
