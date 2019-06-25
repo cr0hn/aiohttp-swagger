@@ -1,5 +1,6 @@
 -r requirements.txt
-pytest
+pytest~=4.3.0
+attrs~=18.2.0
 pytest-cov
 pytest-aiohttp
 flake8
