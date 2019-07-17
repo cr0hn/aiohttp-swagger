@@ -12,4 +12,8 @@ basePath: {{ base_path }}
 schemes:
   - http
   - https
+{% if security_definitions %}
+securityDefinitions:
+{{ security_definitions|nesteddict2yaml }}
+{% endif %}
 paths:

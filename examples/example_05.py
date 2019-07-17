@@ -35,6 +35,22 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus vehicula, met
                   description=long_description,
                   title="My Custom Title",
                   api_version="1.0.3",
-                  contact="my.custom.contact@example.com")
+                  contact="my.custom.contact@example.com",
+                  security_definitions={
+                      'basicAuth': {
+                          'type': 'basic',
+                      },
+                      'OAuth2': {
+                          'type': 'oauth2',
+                          'flow': 'accessCode',
+                          'authorizationUrl': 'https://example.com/oauth/authorize',
+                          'tokenUrl': 'https://example.com/oauth/token',
+                          'scopes': {
+                              'read': 'Grants read access',
+                              'write': 'Grants write access',
+                              'admin': 'Grants read and write access to administrative information',
+                          }
+                      }
+                  })
     
     web.run_app(app, host="127.0.0.1")
