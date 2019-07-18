@@ -93,10 +93,10 @@ def setup_swagger(app: web.Application,
     with open(join(STATIC_PATH, "index.html"), "r") as f:
         app["SWAGGER_TEMPLATE_CONTENT"] = (
             f.read()
-            .replace("##SWAGGER_CONFIG##", '/{}{}'.
-                     format(api_base_url.lstrip('/'), _swagger_def_url))
-            .replace("##STATIC_PATH##", '/{}{}'.
-                     format(api_base_url.lstrip('/'), statics_path))
+            .replace("##SWAGGER_CONFIG##", '{}{}'.
+                     format(api_base_url.rstrip('/'), _swagger_def_url))
+            .replace("##STATIC_PATH##", '{}{}'.
+                     format(api_base_url.rstrip('/'), statics_path))
         )
 
 
