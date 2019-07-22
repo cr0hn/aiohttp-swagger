@@ -68,6 +68,7 @@ def generate_doc_from_each_end_point(
         api_version: str = "1.0.0",
         title: str = "Swagger API",
         contact: str = "",
+        definitions: dict = None,
         security_definitions: dict = None):
     # Clean description
     _start_desc = 0
@@ -98,6 +99,7 @@ def generate_doc_from_each_end_point(
                 title=title,
                 contact=contact,
                 base_path=api_base_url,
+                definitions=definitions,
                 security_definitions=security_definitions)
         )
 
