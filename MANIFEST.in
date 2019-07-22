@@ -1,6 +1,7 @@
 include LICENSE CHANGELOG README.md requirements.txt requirements-performance.txt
 recursive-include aiohttp_swagger/templates *
 recursive-include aiohttp_swagger/swagger_ui *
+recursive-include aiohttp_swagger/swagger_ui3 *
 
 recursive-exclude * __pycache__
 recursive-exclude * *.pyc
