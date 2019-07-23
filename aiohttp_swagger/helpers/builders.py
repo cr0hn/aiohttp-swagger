@@ -78,18 +78,8 @@ def generate_doc_from_each_end_point(
             break
     cleaned_description = "    ".join(description[_start_desc:].splitlines())
 
-    def nesteddict2yaml(d, indent=10, result=""):
-        for key, value in d.items():
-            result += " " * indent + str(key) + ':'
-            if isinstance(value, dict):
-                result = nesteddict2yaml(value, indent + 2, result + "\n")
-            else:
-                result += " " + str(value) + "\n"
-        return result
-
     # Load base Swagger template
     jinja2_env = Environment(loader=BaseLoader())
-    jinja2_env.filters['nesteddict2yaml'] = nesteddict2yaml
 
     with open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r") as f:
         swagger_base = (
@@ -98,13 +88,15 @@ def generate_doc_from_each_end_point(
                 version=api_version,
                 title=title,
                 contact=contact,
-                base_path=api_base_url,
-                definitions=definitions,
-                security_definitions=security_definitions)
+                base_path=api_base_url)
         )
 
     # The Swagger OBJ
     swagger = yaml.load(swagger_base, Loader=yaml.FullLoader)
+    if definitions:
+        swagger["definitions"] = definitions
+    if security_definitions:
+        swagger["securityDefinitions"] = security_definitions
     swagger["paths"] = defaultdict(dict)
 
     for route in app.router.routes():
