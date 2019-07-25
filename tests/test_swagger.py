@@ -231,6 +231,24 @@ def test_undocumented_fn(test_client, loop):
     result = json.loads(text)
     assert not result['paths']
 
+
+@asyncio.coroutine
+def test_wrong_method(test_client, loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('POST', "/post_ping", ping)
+    setup_swagger(app)
+    client = yield from test_client(app)
+    # GET
+    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = yield from swagger_resp1.text()
+    result = json.loads(text)
+    assert "/post_ping" in result['paths']
+    assert "post" in result['paths']["/post_ping"]
+    resp = yield from client.get('/post_ping')
+    assert resp.status == 405
+
+
 @asyncio.coroutine
 def test_class_view(test_client, loop):
     app = web.Application(loop=loop)
