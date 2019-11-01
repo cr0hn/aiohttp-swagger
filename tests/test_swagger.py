@@ -31,6 +31,24 @@ def undoc_ping(request):
     return web.Response(text="pong")
 
 
+@asyncio.coroutine
+def users_with_data_def(request):
+    """
+    ---
+    description: This endpoint returns user which is defined though data definition during initialization.
+    tags:
+    - Users
+    produces:
+    - application/json
+    responses:
+        "200":
+            description: Successful operation, returns User object nested permisiion list
+            schema:
+              $ref: '#/definitions/User'
+    """
+    return web.Response(text="pong")
+
+
 class ClassView(web.View):
     def _irrelevant_method(self):
         pass
@@ -106,8 +124,7 @@ def test_swagger_file_url(test_client, loop):
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/doc/swagger.json')
     assert resp1.status == 200
-    text = yield from resp1.text()
-    result = json.loads(text)
+    result = yield from resp1.json()
     assert '/example1' in result['paths']
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
@@ -122,8 +139,7 @@ def test_partial_swagger_file(test_client, loop):
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/doc/swagger.json')
     assert resp1.status == 200
-    text = yield from resp1.text()
-    result = json.loads(text)
+    result = yield from resp1.json()
     assert '/ping-partial' in result['paths']
 
 
@@ -142,8 +158,7 @@ def test_custom_swagger(test_client, loop):
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    text = yield from resp1.text()
-    result = json.loads(text)
+    result = yield from resp1.json()
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
 
@@ -164,8 +179,7 @@ def test_swagger_home_decorator(test_client, loop):
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    text = yield from resp1.text()
-    result = json.loads(text)
+    result = yield from resp1.json()
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
 
@@ -186,8 +200,7 @@ def test_swagger_def_decorator(test_client, loop):
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    text = yield from resp1.text()
-    result = json.loads(text)
+    result = yield from resp1.json()
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
 
@@ -210,8 +223,7 @@ def test_swagger_info(test_client, loop, swagger_info):
     client = yield from test_client(app)
     resp1 = yield from client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    text = yield from resp1.text()
-    result = json.loads(text)
+    result = yield from resp1.json()
     assert '/example1' in result['paths']
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
@@ -227,8 +239,7 @@ def test_undocumented_fn(test_client, loop):
     assert resp.status == 200
     swagger_resp1 = yield from client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    text = yield from swagger_resp1.text()
-    result = json.loads(text)
+    result = yield from swagger_resp1.json()
     assert not result['paths']
 
 
@@ -241,8 +252,7 @@ def test_wrong_method(test_client, loop):
     # GET
     swagger_resp1 = yield from client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    text = yield from swagger_resp1.text()
-    result = json.loads(text)
+    result = yield from swagger_resp1.json()
     assert "/post_ping" in result['paths']
     assert "post" in result['paths']["/post_ping"]
     resp = yield from client.get('/post_ping')
@@ -263,8 +273,7 @@ def test_class_view(test_client, loop):
     assert 'OK' in text
     swagger_resp1 = yield from client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    text = yield from swagger_resp1.text()
-    result = json.loads(text)
+    result = yield from swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
@@ -274,8 +283,7 @@ def test_class_view(test_client, loop):
     assert resp.status == 200
     text = yield from resp.text()
     assert 'OK' in text
-    text = yield from swagger_resp1.text()
-    result = json.loads(text)
+    result = yield from swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
@@ -285,10 +293,27 @@ def test_class_view(test_client, loop):
     assert resp.status == 200
     text = yield from resp.text()
     assert 'OK' in text
-    text = yield from swagger_resp1.text()
-    result = json.loads(text)
+    result = yield from swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "patch" not in result['paths']["/class_view"]
+
+
+@asyncio.coroutine
+def test_data_defs(test_client, loop):
+    TESTS_PATH = abspath(join(dirname(__file__)))
+    file = open(TESTS_PATH + "/data/example_data_definitions.json")
+    app = web.Application(loop=loop)
+    app.router.add_route('GET', "/users", users_with_data_def)
+    setup_swagger(app, definitions=json.loads(file.read()))
+    file.close()
+
+    client = yield from test_client(app)
+    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    result = yield from swagger_resp1.json()
+    assert 'User' in result['definitions']
+    assert 'Permission' in result['definitions']
+    assert result['definitions']['User']['properties']['permissions']['items']['$ref'] is not None
 
 
 @asyncio.coroutine
@@ -307,8 +332,7 @@ def test_sub_app(test_client, loop):
     assert 'OK' in text
     swagger_resp1 = yield from client.get('/sub_app/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    text = yield from swagger_resp1.text()
-    result = json.loads(text)
+    result = yield from swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]

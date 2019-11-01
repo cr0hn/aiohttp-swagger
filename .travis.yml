@@ -2,11 +2,19 @@ language: python
 sudo: false
 python:
   - "3.6"
+  - "3.7"
+  - "3.8"
+
+env:
+  - AIOHTTP_VERSION=3.6.2
+  - AIOHTTP_VERSION=2.3.10
 
 install:
   - python setup.py install
+  - pip install -U pip
   - pip install -r requirements-dev.txt
-  - pip install codecov
+  - pip install -U codecov
+  - pip install -q aiohttp==$AIOHTTP_VERSION
 
 script:
   - make cov

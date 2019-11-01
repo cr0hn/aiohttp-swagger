@@ -1,0 +1,47 @@
+{
+  "User": {
+    "type": "object",
+
+    "properties": {
+      "first_name": {
+        "type": "string",
+        "description": "User's first name",
+        "default": "John"
+      },
+      "last_name": {
+        "type": "string",
+        "description": "User's last name",
+        "default": "Doe"
+      },
+      "permissions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/definitions/Permission"
+        }
+      }
+    },
+    "required": [
+      "first_name",
+      "last_name"
+    ]
+  },
+  "Permission": {
+    "type": "object",
+    "properties": {
+      "permission_param_1": {
+        "type": "string",
+        "description": "User's permission parameter",
+        "default": "some_perm"
+      },
+      "permission_param_2": {
+        "type": "string",
+        "description": "User's permission parameter",
+        "default": "some_perm"
+      }
+    },
+    "required": [
+      "permission_param_1",
+      "permission_param_2"
+    ]
+  }
+}
