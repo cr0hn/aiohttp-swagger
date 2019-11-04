@@ -168,6 +168,65 @@ Global Swagger YAML
 
     web.run_app(app, host="127.0.0.1")
 
+Data Definitions
++++++++++++++++++++
+
+:samp:`aiohttp-swagger` allow to specify data models and to reuse it later when documenting API.
+Following example shows how to define nested object and reuse it when writing swagger doc.
+
+.. code-block:: python
+    @asyncio.coroutine
+    def users_with_data_def(request):
+        """
+        ---
+        description: This endpoint returns user which is defined though data definition during initialization.
+        tags:
+        - Users
+        produces:
+        - application/json
+        responses:
+            "200":
+                description: Successful operation, returns User object nested permisiion list
+                schema:
+                  $ref: '#/definitions/User'
+        """
+        users = fetch_users()
+        return web.Response(json.dumps(users))
+
+    app = web.Application()
+
+    app.router.add_route('GET', "/users", users_with_data_def)
+
+    setup_swagger(app, definitions={
+        "User": {
+          "type": "object",
+          "properties": {
+            "username": {
+              "type": "string",
+              "description": "User's username name",
+              "default": "John"
+            },
+            "permissions": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Permission"
+              }
+            }
+          }
+        },
+        "Permission": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Permission name"
+            }
+          }
+        }
+    })
+
+    web.run_app(app, host="127.0.0.1")
+
 Nested applications
 +++++++++++++++++++
 

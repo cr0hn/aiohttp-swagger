@@ -83,6 +83,8 @@ def generate_doc_from_each_end_point(
             result += " " * indent + str(key) + ':'
             if isinstance(value, dict):
                 result = nesteddict2yaml(value, indent + 2, result + "\n")
+            elif isinstance(value, str):
+                result += " \"" + str(value) + "\"\n"
             else:
                 result += " " + str(value) + "\n"
         return result

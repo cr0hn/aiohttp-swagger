@@ -1,5 +1,5 @@
 -r requirements.txt
-pytest
-pytest-cov
-pytest-aiohttp
-flake8
+pytest==5.2.2
+pytest-cov==2.8.1
+pytest-aiohttp==0.3.0
+flake8==3.7.9
