@@ -175,6 +175,7 @@ Data Definitions
 Following example shows how to define nested object and reuse it when writing swagger doc.
 
 .. code-block:: python
+
     @asyncio.coroutine
     def users_with_data_def(request):
         """
