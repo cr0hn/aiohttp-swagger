@@ -37,6 +37,7 @@ def _extract_swagger_docs(end_point_doc, method="get"):
         }
     return {method: end_point_swagger_doc}
 
+
 def _build_doc_from_func_doc(route):
 
     out = {}
@@ -59,6 +60,7 @@ def _build_doc_from_func_doc(route):
             return {}
         out.update(_extract_swagger_docs(end_point_doc, method=str(route.method).lower()))
     return out
+
 
 def generate_doc_from_each_end_point(
         app: web.Application,
