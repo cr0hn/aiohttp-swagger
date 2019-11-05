@@ -41,9 +41,8 @@ def _extract_swagger_docs(end_point_doc, method="get"):
 def _build_doc_from_func_doc(route):
 
     out = {}
-    is_method_allowed = route.method == METH_ANY or route.method in METH_ALL
     
-    if isclass(route.handler) and issubclass(route.handler, web.View) and is_method_allowed:
+    if isclass(route.handler) and issubclass(route.handler, web.View) and route.method == METH_ANY:
         method_names = {
             attr for attr in dir(route.handler)
             if attr.upper() in METH_ALL
