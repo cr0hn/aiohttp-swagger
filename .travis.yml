@@ -31,6 +31,8 @@ deploy:
   distributions: "sdist"
   on:
     branch: master
+    python: 3.7
+    condition: $AIOHTTP_VERSION = 3.6.2
 
 #  - provider: script
 #    script: deploy/pypi.sh
