@@ -30,6 +30,7 @@ deploy:
   password: $PYPI_PASSWD
   distributions: "sdist"
   on:
+    tags: true
     branch: master
     python: 3.7
     condition: $AIOHTTP_VERSION = 3.6.2
