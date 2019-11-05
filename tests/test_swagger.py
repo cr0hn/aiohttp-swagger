@@ -262,7 +262,7 @@ def test_wrong_method(test_client, loop):
 @asyncio.coroutine
 def test_class_view(test_client, loop):
     app = web.Application(loop=loop)
-    app.router.add_view("/class_view", ClassView)
+    app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(app)
 
     client = yield from test_client(app)
