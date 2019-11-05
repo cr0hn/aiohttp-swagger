@@ -208,7 +208,7 @@ def test_swagger_def_decorator(test_client, loop):
 @pytest.fixture
 def swagger_info():
     filename = abspath(join(dirname(__file__))) + "/data/example_swagger.yaml"
-    return yaml.load(open(filename).read())
+    return yaml.full_load(open(filename).read())
 
 
 @asyncio.coroutine
