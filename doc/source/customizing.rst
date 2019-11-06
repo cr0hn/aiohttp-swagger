@@ -256,3 +256,16 @@ In this case `api_base_url` argument of `setup_swagger` function should be the s
     app.add_subapp(prefix='/sub_app_prefix', subapp=sub_app)
 
     web.run_app(app, host="127.0.0.1")
+
+Swagger validation
++++++++++++++++++++
+
+:samp:`aiohttp-swagger` allows to perform online swagger validation. By default this feature is turned off `(swagger_validator_url='')`:
+
+
+.. code-block:: python
+
+    setup_swagger(app,
+                  api_base_url='/sub_app_prefix',
+                  swagger_validator_url='//online.swagger.io/validator'
+                  )
