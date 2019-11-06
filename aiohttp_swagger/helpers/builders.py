@@ -159,8 +159,9 @@ def generate_doc_from_each_end_point(
 
 
 def load_doc_from_yaml_file(doc_path: str):
-    loaded_yaml = yaml.full_load(open(doc_path, "r").read())
-    return json.dumps(loaded_yaml)
+    with open(doc_path, "r") as f:
+        loaded_yaml = yaml.full_load(f.read())
+        return json.dumps(loaded_yaml)
 
 
 __all__ = ("generate_doc_from_each_end_point", "load_doc_from_yaml_file")
