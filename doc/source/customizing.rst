@@ -207,8 +207,7 @@ Following example shows how to define nested object and reuse it when writing sw
 
 .. code-block:: python
 
-    @asyncio.coroutine
-    def users_with_data_def(request):
+    async def users_with_data_def(request):
         """
         ---
         description: This endpoint returns user which is defined though data definition during initialization.

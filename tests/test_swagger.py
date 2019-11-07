@@ -8,8 +8,7 @@ from aiohttp import web
 from aiohttp_swagger import *
 
 
-@asyncio.coroutine
-def ping(request):
+async def ping(request):
     """
     ---
     description: This end-point allow to test that service is up.
@@ -26,13 +25,11 @@ def ping(request):
     return web.Response(text="pong")
 
 
-@asyncio.coroutine
-def undoc_ping(request):
+async def undoc_ping(request):
     return web.Response(text="pong")
 
 
-@asyncio.coroutine
-def users_with_data_def(request):
+async def users_with_data_def(request):
     """
     ---
     description: This endpoint returns user which is defined though data definition during initialization.
@@ -53,8 +50,7 @@ class ClassView(web.View):
     def _irrelevant_method(self):
         pass
 
-    @asyncio.coroutine
-    def get(self):
+    async def get(self):
         """
         ---
         description: Get resources
@@ -70,8 +66,7 @@ class ClassView(web.View):
         """
         return web.Response(text="OK")
 
-    @asyncio.coroutine
-    def post(self):
+    async def post(self):
         """
         ---
         description: Post resources
@@ -87,8 +82,7 @@ class ClassView(web.View):
         """
         return web.Response(text="OK")
 
-    @asyncio.coroutine
-    def patch(self):
+    async def patch(self):
         """
         This method is undocumented in the swagger sense.
         """
@@ -96,55 +90,49 @@ class ClassView(web.View):
 
 
 @swagger_path(abspath(join(dirname(__file__))) + '/data/partial_swagger.yaml')
-@asyncio.coroutine
-def ping_partial(request):
+async def ping_partial(request):
     return web.Response(text="pong")
 
 
-@asyncio.coroutine
-def test_ping(test_client, loop):
+async def test_ping(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
-
-    client = yield from test_client(app)
-    resp = yield from client.get('/ping')
+    client = await test_client(app)
+    resp = await client.get('/ping')
     assert resp.status == 200
-    text = yield from resp.text()
+    text = await resp.text()
     assert 'pong' in text
 
 
-@asyncio.coroutine
-def test_swagger_file_url(test_client, loop):
+async def test_swagger_file_url(test_client, loop):
     TESTS_PATH = abspath(join(dirname(__file__)))
 
     app = web.Application(loop=loop)
     setup_swagger(app,
                   swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
 
-    client = yield from test_client(app)
-    resp1 = yield from client.get('/api/doc/swagger.json')
+    client = await test_client(app)
+    resp1 = await client.get('/api/doc/swagger.json')
     assert resp1.status == 200
-    result = yield from resp1.json()
+    result = await resp1.json()
     assert '/example1' in result['paths']
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
 
 
-@asyncio.coroutine
-def test_partial_swagger_file(test_client, loop):
+async def test_partial_swagger_file(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping-partial", ping_partial)
     setup_swagger(app)
 
-    client = yield from test_client(app)
-    resp1 = yield from client.get('/api/doc/swagger.json')
+    client = await test_client(app)
+    resp1 = await client.get('/api/doc/swagger.json')
     assert resp1.status == 200
-    result = yield from resp1.json()
+    result = await resp1.json()
     assert '/ping-partial' in result['paths']
 
 
-@asyncio.coroutine
-def test_custom_swagger(test_client, loop):
+async def test_custom_swagger(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -155,16 +143,15 @@ def test_custom_swagger(test_client, loop):
                   api_version="1.0.0",
                   contact="my.custom.contact@example.com")
 
-    client = yield from test_client(app)
-    resp1 = yield from client.get('/api/v1/doc/swagger.json')
+    client = await test_client(app)
+    resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    result = yield from resp1.json()
+    result = await resp1.json()
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
 
 
-@asyncio.coroutine
-def test_swagger_home_decorator(test_client, loop):
+async def test_swagger_home_decorator(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -176,16 +163,15 @@ def test_swagger_home_decorator(test_client, loop):
                   contact="my.custom.contact@example.com",
                   swagger_home_decor=lambda x: x)
 
-    client = yield from test_client(app)
-    resp1 = yield from client.get('/api/v1/doc/swagger.json')
+    client = await test_client(app)
+    resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    result = yield from resp1.json()
+    result = await resp1.json()
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
 
 
-@asyncio.coroutine
-def test_swagger_def_decorator(test_client, loop):
+async def test_swagger_def_decorator(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -197,10 +183,10 @@ def test_swagger_def_decorator(test_client, loop):
                   contact="my.custom.contact@example.com",
                   swagger_def_decor=lambda x: x)
 
-    client = yield from test_client(app)
-    resp1 = yield from client.get('/api/v1/doc/swagger.json')
+    client = await test_client(app)
+    resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    result = yield from resp1.json()
+    result = await resp1.json()
     assert '/ping' in result['paths']
     assert 'Test Custom Title' in result['info']['title']
 
@@ -211,8 +197,7 @@ def swagger_info():
     return yaml.full_load(open(filename).read())
 
 
-@asyncio.coroutine
-def test_swagger_info(test_client, loop, swagger_info):
+async def test_swagger_info(test_client, loop, swagger_info):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -220,86 +205,82 @@ def test_swagger_info(test_client, loop, swagger_info):
                   swagger_url="/api/v1/doc",
                   swagger_info=swagger_info)
 
-    client = yield from test_client(app)
-    resp1 = yield from client.get('/api/v1/doc/swagger.json')
+    client = await test_client(app)
+    resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
-    result = yield from resp1.json()
+    result = await resp1.json()
     assert '/example1' in result['paths']
     assert '/example2' in result['paths']
     assert 'API Title' in result['info']['title']
 
 
-@asyncio.coroutine
-def test_undocumented_fn(test_client, loop):
+async def test_undocumented_fn(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/undoc_ping", undoc_ping)
     setup_swagger(app)
-    client = yield from test_client(app)
-    resp = yield from client.get('/undoc_ping')
+    client = await test_client(app)
+    resp = await client.get('/undoc_ping')
     assert resp.status == 200
-    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert not result['paths']
 
 
-@asyncio.coroutine
-def test_wrong_method(test_client, loop):
+async def test_wrong_method(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('POST', "/post_ping", ping)
     setup_swagger(app)
-    client = yield from test_client(app)
+    client = await test_client(app)
     # GET
-    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert "/post_ping" in result['paths']
     assert "post" in result['paths']["/post_ping"]
-    resp = yield from client.get('/post_ping')
+    resp = await client.get('/post_ping')
     assert resp.status == 405
 
 
-@asyncio.coroutine
-def test_class_view(test_client, loop):
+async def test_class_view(test_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(app)
 
-    client = yield from test_client(app)
+    client = await test_client(app)
     # GET
-    resp = yield from client.get('/class_view')
+    resp = await client.get('/class_view')
     assert resp.status == 200
-    text = yield from resp.text()
+    text = await resp.text()
     assert 'OK' in text
-    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
 
     # POST
-    resp = yield from client.post('/class_view')
+    resp = await client.post('/class_view')
     assert resp.status == 200
-    text = yield from resp.text()
+    text = await resp.text()
     assert 'OK' in text
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
 
     # Undocumented PATCH
-    resp = yield from client.patch('/class_view')
+    resp = await client.patch('/class_view')
     assert resp.status == 200
-    text = yield from resp.text()
+    text = await resp.text()
     assert 'OK' in text
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "patch" not in result['paths']["/class_view"]
 
 
-@asyncio.coroutine
-def test_data_defs(test_client, loop):
+async def test_data_defs(test_client, loop):
     TESTS_PATH = abspath(join(dirname(__file__)))
     file = open(TESTS_PATH + "/data/example_data_definitions.json")
     app = web.Application(loop=loop)
@@ -307,32 +288,31 @@ def test_data_defs(test_client, loop):
     setup_swagger(app, definitions=json.loads(file.read()))
     file.close()
 
-    client = yield from test_client(app)
-    swagger_resp1 = yield from client.get('/api/doc/swagger.json')
+    client = await test_client(app)
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert 'User' in result['definitions']
     assert 'Permission' in result['definitions']
     assert result['definitions']['User']['properties']['permissions']['items']['$ref'] is not None
 
 
-@asyncio.coroutine
-def test_sub_app(test_client, loop):
+async def test_sub_app(test_client, loop):
     sub_app = web.Application(loop=loop)
     sub_app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(sub_app, api_base_url='/sub_app')
     app = web.Application(loop=loop)
     app.add_subapp(prefix='/sub_app', subapp=sub_app)
 
-    client = yield from test_client(app)
+    client = await test_client(app)
     # GET
-    resp = yield from client.get('/sub_app/class_view')
+    resp = await client.get('/sub_app/class_view')
     assert resp.status == 200
-    text = yield from resp.text()
+    text = await resp.text()
     assert 'OK' in text
-    swagger_resp1 = yield from client.get('/sub_app/api/doc/swagger.json')
+    swagger_resp1 = await client.get('/sub_app/api/doc/swagger.json')
     assert swagger_resp1.status == 200
-    result = yield from swagger_resp1.json()
+    result = await swagger_resp1.json()
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]

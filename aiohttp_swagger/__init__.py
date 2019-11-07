@@ -13,8 +13,7 @@ except ImportError:
     import json
 
 
-@asyncio.coroutine
-def _swagger_home(request):
+async def _swagger_home(request):
     """
     Return the index.html main file
     """
@@ -24,8 +23,7 @@ def _swagger_home(request):
     )
 
 
-@asyncio.coroutine
-def _swagger_def(request):
+async def _swagger_def(request):
     """
     Returns the Swagger JSON Definition
     """
