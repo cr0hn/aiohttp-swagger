@@ -48,6 +48,7 @@ def setup_swagger(app: web.Application,
                   swagger_home_decor: FunctionType = None,
                   swagger_def_decor: FunctionType = None,
                   swagger_info: dict = None,
+                  swagger_template_path: str = None,
                   definitions: dict = None,
                   security_definitions: dict = None):
     _swagger_url = ("/{}".format(swagger_url)
@@ -64,8 +65,9 @@ def setup_swagger(app: web.Application,
             swagger_info = generate_doc_from_each_end_point(
                 app, api_base_url=api_base_url, description=description,
                 api_version=api_version, title=title, contact=contact,
+                template_path=swagger_template_path,
                 definitions=definitions,
-                security_definitions=security_definitions,
+                security_definitions=security_definitions
             )
     else:
         swagger_info = json.dumps(swagger_info)

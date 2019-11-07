@@ -70,6 +70,7 @@ def generate_doc_from_each_end_point(
         api_version: str = "1.0.0",
         title: str = "Swagger API",
         contact: str = "",
+        template_path: str = None,
         definitions: dict = None,
         security_definitions: dict = None):
     # Clean description
@@ -95,7 +96,10 @@ def generate_doc_from_each_end_point(
     jinja2_env = Environment(loader=BaseLoader())
     jinja2_env.filters['nesteddict2yaml'] = nesteddict2yaml
 
-    with open(join(SWAGGER_TEMPLATE, "swagger.yaml"), "r") as f:
+    if template_path is None:
+        template_path = join(SWAGGER_TEMPLATE, "swagger.yaml")
+
+    with open(template_path, "r") as f:
         swagger_base = (
             jinja2_env.from_string(f.read()).render(
                 description=cleaned_description,

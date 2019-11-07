@@ -8,6 +8,7 @@ You can change this valued for Swagger doc:
 3. API **Version**: Version of your API
 4. **Title**: Title for your API
 5. **Contact**: Contact info.
+6. **Template Path**:Path to custom swagger template file.
 
 .. code-block:: python
 
@@ -44,13 +45,43 @@ You can change this valued for Swagger doc:
                   description=long_description,
                   title="My Custom Title",
                   api_version="1.0.3",
-                  contact="my.custom.contact@example.com")
+                  contact="my.custom.contact@example.com"
+                  template_path="my/custom/path/to/swagger.yaml")
 
     web.run_app(app, host="127.0.0.1")
 
 It produces:
 
 .. image:: _static/swagger_custom_params.jpg
+
+Follows default swagger Jinja2 template which is used in the library:
+
+.. code-block:: yaml
+
+    swagger: "2.0"
+    info:
+      description: |
+        {{ description }}
+      version: "{{ version }}"
+      title: {{ title }}
+      {% if contact %}
+      contact:
+        name: {{ contact }}
+      {% endif %}
+    basePath: {{ base_path }}
+    schemes:
+      - http
+      - https
+    {% if definitions %}
+    definitions:
+    {{ definitions|nesteddict2yaml }}
+    {% endif %}
+    {% if security_definitions %}
+    securityDefinitions:
+    {{ security_definitions|nesteddict2yaml }}
+    {% endif %}
+    paths:
+
 
 Adding Swagger from external file
 ---------------------------------
