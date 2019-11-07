@@ -11,11 +11,11 @@ env:
   - AIOHTTP_VERSION=2.3.10
 
 install:
-  - python setup.py install
   - pip install -U pip
+  - pip install -q aiohttp==$AIOHTTP_VERSION
+  - python setup.py install
   - pip install -r requirements-dev.txt
   - pip install -U codecov
-  - pip install -q aiohttp==$AIOHTTP_VERSION
 
 script:
   - make cov
