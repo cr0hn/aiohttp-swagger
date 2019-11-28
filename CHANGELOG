@@ -1,5 +1,9 @@
 Version 1.0.13
 =============
+- Updated swagger ui version to 3.24.3
+
+Version 1.0.13
+=============
 - Increased OpenApi document version to 3.0.1 for Swagger UI 3
 
 Version 1.0.12
