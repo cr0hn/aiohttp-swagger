@@ -65,6 +65,7 @@ def _build_doc_from_func_doc(route):
 def generate_doc_from_each_end_point(
         app: web.Application,
         *,
+        ui_version: int = None,
         api_base_url: str = "/",
         description: str = "Swagger API definition",
         api_version: str = "1.0.0",
@@ -97,7 +98,10 @@ def generate_doc_from_each_end_point(
     jinja2_env.filters['nesteddict2yaml'] = nesteddict2yaml
 
     if template_path is None:
-        template_path = join(SWAGGER_TEMPLATE, "swagger.yaml")
+        if ui_version == 3:
+            template_path = join(SWAGGER_TEMPLATE, "openapi.yaml")
+        else:
+            template_path = join(SWAGGER_TEMPLATE, "swagger.yaml")
 
     with open(template_path, "r") as f:
         swagger_base = (

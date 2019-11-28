@@ -64,7 +64,8 @@ def setup_swagger(app: web.Application,
             swagger_info = load_doc_from_yaml_file(swagger_from_file)
         else:
             swagger_info = generate_doc_from_each_end_point(
-                app, api_base_url=api_base_url, description=description,
+                app, ui_version=ui_version,
+                api_base_url=api_base_url, description=description,
                 api_version=api_version, title=title, contact=contact,
                 template_path=swagger_template_path,
                 definitions=definitions,
