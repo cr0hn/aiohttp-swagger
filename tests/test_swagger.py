@@ -8,6 +8,7 @@ from aiohttp import web
 from aiohttp_swagger import *
 
 
+
 async def ping(request):
     """
     ---
@@ -102,6 +103,45 @@ async def test_ping(test_client, loop):
     assert resp.status == 200
     text = await resp.text()
     assert 'pong' in text
+
+
+async def test_swagger_ui(test_client, loop):
+
+    TESTS_PATH = abspath(join(dirname(__file__)))
+
+    app = web.Application(loop=loop)
+    setup_swagger(app,
+                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
+
+    client = await test_client(app)
+    resp1 = await client.get('/api/doc')
+    assert resp1.status == 200
+    retrieved = await resp1.text()
+    loaded = open(join(TESTS_PATH, "..", "aiohttp_swagger/swagger_ui/index.html")).read()
+    loaded = loaded.replace("##STATIC_PATH##", "/api/doc/swagger_static")
+    loaded = loaded.replace("##SWAGGER_CONFIG##", "/api/doc/swagger.json")
+    loaded = loaded.replace("##SWAGGER_VALIDATOR_URL##", '')
+    assert retrieved == loaded
+
+
+async def test_swagger_ui3(test_client, loop):
+    TESTS_PATH = abspath(join(dirname(__file__)))
+
+    app = web.Application(loop=loop)
+    setup_swagger(app,
+                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml",
+                  ui_version=3
+                  )
+
+    client = await test_client(app)
+    resp1 = await client.get('/api/doc')
+    assert resp1.status == 200
+    retrieved = await resp1.text()
+    loaded = open(join(TESTS_PATH, "..", "aiohttp_swagger/swagger_ui3/index.html")).read()
+    loaded = loaded.replace("##STATIC_PATH##", "/api/doc/swagger_static")
+    loaded = loaded.replace("##SWAGGER_CONFIG##", "/api/doc/swagger.json")
+    loaded = loaded.replace("##SWAGGER_VALIDATOR_URL##", '')
+    assert retrieved == loaded
 
 
 async def test_swagger_file_url(test_client, loop):
