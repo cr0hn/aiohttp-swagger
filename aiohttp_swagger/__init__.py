@@ -30,9 +30,6 @@ async def _swagger_def(request):
     return web.json_response(text=request.app["SWAGGER_DEF_CONTENT"])
 
 
-STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
-
-
 def setup_swagger(app: web.Application,
                   *,
                   swagger_from_file: str = None,
@@ -41,6 +38,7 @@ def setup_swagger(app: web.Application,
                   swagger_validator_url: str = "",
                   description: str = "Swagger API definition",
                   api_version: str = "1.0.0",
+                  ui_version: int = None,
                   title: str = "Swagger API",
                   contact: str = "",
                   swagger_home_decor: FunctionType = None,
@@ -54,6 +52,11 @@ def setup_swagger(app: web.Application,
                     else swagger_url)
     _base_swagger_url = _swagger_url.rstrip('/')
     _swagger_def_url = '{}/swagger.json'.format(_base_swagger_url)
+
+    if ui_version == 3:
+        STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui3"))
+    else:
+        STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
 
     # Build Swagget Info
     if swagger_info is None:
