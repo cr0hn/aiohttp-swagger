@@ -42,7 +42,9 @@ Where to access to API Doc
 
 By default, API will be generated at URL: :samp:`yourdomain.com/api/doc`.
 
-You can modify the URI adding the parameter :samp:`swagger_url` in :samp:`setup_swagger`:
+You can modify the URI adding the parameter :samp:`swagger_url` in :samp:`setup_swagger`.
+
+You can specify UI version (Version 2 and 3 are supported) by adding the parameter :samp:`ui_version` in :samp:`ui_version`.
 
 .. code-block:: python
 
@@ -69,6 +71,6 @@ You can modify the URI adding the parameter :samp:`swagger_url` in :samp:`setup_
     app = web.Application()
     app.router.add_route('GET', "/ping", ping)
 
-    setup_swagger(app, swagger_url="/api/v1/doc")  # <-- NEW Doc URI
+    setup_swagger(app, swagger_url="/api/v1/doc", ui_version=2)  # <-- NEW Doc URI
 
     web.run_app(app, host="127.0.0.1")
