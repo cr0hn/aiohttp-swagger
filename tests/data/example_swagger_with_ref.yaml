@@ -1,0 +1,28 @@
+swagger: "2.0"
+info:
+  description: |
+    API Description
+  version: "1.0"
+  title: API Title
+  contact:
+    name: my@contact.com
+basePath: /
+schemes:
+  - http
+  - https
+definitions:
+  UserData:
+    description: Schema for a user item
+    properties:
+      user_id:
+        description: User id
+        type: string
+        minLength: 1
+      gender:
+        description: User gender
+        type: string
+        enum:
+          - male
+          - female
+        default: female
+        example: female

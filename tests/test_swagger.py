@@ -1,10 +1,14 @@
 import json
-import pytest
-import yaml
-from os.path import join, dirname, abspath
+from os.path import (
+    join,
+    dirname,
+    abspath,
+)
 
 from aiohttp import web
 from aiohttp_swagger import *
+import pytest
+import yaml
 
 
 async def ping(request):
@@ -88,6 +92,45 @@ class ClassView(web.View):
         return web.Response(text="OK")
 
 
+class ClassViewWithSwaggerDoc(web.View):
+
+    def _irrelevant_method(self):
+        pass
+
+    async def get(self):
+        """
+        ---
+        description: Get resources
+        tags:
+        - Class View
+        produces:
+        - application/json
+        consumes:
+        - application/json
+        parameters:
+        - in: body
+          name: body
+          description: Created user object
+          required: false
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+              username:
+                type:
+                  - "string"
+                  - "null"
+        responses:
+            "200":
+                description: successful operation.
+            "405":
+                description: invalid HTTP Method
+        """
+        return web.Response(text="OK")
+
+
 @swagger_path(abspath(join(dirname(__file__))) + '/data/partial_swagger.yaml')
 async def ping_partial(request):
     return web.Response(text="pong")
@@ -144,11 +187,8 @@ async def test_swagger_ui3(test_client, loop):
 
 async def test_swagger_file_url(test_client, loop):
     TESTS_PATH = abspath(join(dirname(__file__)))
-
     app = web.Application(loop=loop)
-    setup_swagger(app,
-                  swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
-
+    setup_swagger(app, swagger_from_file=swagger_file)
     client = await test_client(app)
     resp1 = await client.get('/api/doc/swagger.json')
     assert resp1.status == 200
@@ -238,7 +278,6 @@ def swagger_info():
 async def test_swagger_info(test_client, loop, swagger_info):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
-    description = "Test Custom Swagger"
     setup_swagger(app,
                   swagger_url="/api/v1/doc",
                   swagger_info=swagger_info)
@@ -354,3 +393,48 @@ async def test_sub_app(test_client, loop):
     assert "/class_view" in result['paths']
     assert "get" in result['paths']["/class_view"]
     assert "post" in result['paths']["/class_view"]
+
+
+async def test_class_merge_swagger_view(test_client, loop, swagger_file):
+    app = web.Application(loop=loop)
+    app.router.add_route('*', "/example2", ClassViewWithSwaggerDoc)
+    setup_swagger(
+        app,
+        swagger_merge_with_file=True,
+        swagger_from_file=swagger_file,
+    )
+    client = await test_client(app)
+    resp = await client.get('/example2')
+    assert resp.status == 200
+    text = await resp.text()
+    assert 'OK' in text
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = await swagger_resp1.text()
+    result = json.loads(text)
+    assert "/example2" in result['paths']
+    assert "get" in result['paths']["/example2"]
+    assert result['paths']["/example2"]["get"]["parameters"][0]["schema"][
+        "properties"]["id"]["type"] == "integer"
+
+
+async def test_class_no_merge_swagger_view(test_client, loop, swagger_file):
+    app = web.Application(loop=loop)
+    app.router.add_route('*', "/example2", ClassViewWithSwaggerDoc)
+    setup_swagger(
+        app,
+        swagger_merge_with_file=False,
+        swagger_from_file=swagger_file,
+    )
+    client = await test_client(app)
+    resp = await client.get('/example2')
+    assert resp.status == 200
+    text = await resp.text()
+    assert 'OK' in text
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    text = await swagger_resp1.text()
+    result = json.loads(text)
+    assert "/example2" in result['paths']
+    assert "get" in result['paths']["/example2"]
+    assert "schema" not in result['paths']["/example2"]["get"]["parameters"][0]
