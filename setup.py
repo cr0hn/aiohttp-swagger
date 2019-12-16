@@ -61,7 +61,7 @@ setup(
     license='BSD',
     author='Daniel Garcia (cr0hn)',
     author_email='cr0hn@cr0hn.com',
-    packages=find_packages(),
+    packages=find_packages(exclude=('tests',)),
     include_package_data=True,
     extras_require={
         'performance':  required_performance
