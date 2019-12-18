@@ -29,7 +29,17 @@ def _extract_swagger_docs(end_point_doc, method="get"):
         end_point_swagger_doc = (
             yaml.full_load("\n".join(end_point_doc[end_point_swagger_start:]))
         )
-    except yaml.YAMLError:
+    except yaml.YAMLError as exc:
+        if hasattr(exc, 'problem_mark'):
+            if exc.context != None:
+                print ('  parser says\n' + str(exc.problem_mark) + '\n  ' +
+                    str(exc.problem) + ' ' + str(exc.context) +
+                    '\nPlease correct data and retry.')
+            else:
+                print ('  parser says\n' + str(exc.problem_mark) + '\n  ' +
+                    str(exc.problem) + '\nPlease correct data and retry.')
+        else:
+            print ("Something went wrong while parsing yaml file")
         end_point_swagger_doc = {
             "description": "⚠ Swagger document could not be loaded "
                            "from docstring ⚠",
