@@ -305,7 +305,7 @@ async def test_class_view_single_method(aiohttp_client, loop):
 
 async def test_class_view_multiple_methods(aiohttp_client, loop):
     app = web.Application(loop=loop)
-    app.router.add_route("*", "/class_view", ClassView)
+    app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(app)
 
     client = await aiohttp_client(app)
