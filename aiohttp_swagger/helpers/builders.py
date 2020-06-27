@@ -41,13 +41,8 @@ def _extract_swagger_docs(end_point_doc, method="get"):
 def _build_doc_from_func_doc(route):
 
     out = {}
-    
-    if isclass(route.handler) and issubclass(route.handler, web.View) and route.method == METH_ANY:
-        method_names = {
-            attr for attr in dir(route.handler)
-            if attr.upper() in METH_ALL
-        }
-        for method_name in method_names:
+    if isclass(route.handler) and issubclass(route.handler, web.View):
+        for method_name in _get_method_names_for_handler(route):
             method = getattr(route.handler, method_name)
             if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
@@ -60,6 +55,20 @@ def _build_doc_from_func_doc(route):
             return {}
         out.update(_extract_swagger_docs(end_point_doc, method=str(route.method).lower()))
     return out
+
+def _get_method_names_for_handler(route):
+    # Return all valid method names in handler if the method is *,
+    # otherwise return the specific method.
+    if route.method == METH_ANY:
+        return {
+            attr for attr in dir(route.handler)
+            if attr.upper() in METH_ALL
+        }
+    else:
+        return {
+            attr for attr in dir(route.handler)
+            if attr.upper() in METH_ALL and attr.upper() == route.method
+        }
 
 
 def generate_doc_from_each_end_point(
