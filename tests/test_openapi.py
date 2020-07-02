@@ -93,7 +93,7 @@ async def ping_partial(request):
     return web.Response(text="pong")
 
 
-async def test_swagger_ui(test_client, loop):
+async def test_swagger_ui(aiohttp_client, loop):
     TESTS_PATH = abspath(join(dirname(__file__)))
 
     app = web.Application(loop=loop)
@@ -102,7 +102,7 @@ async def test_swagger_ui(test_client, loop):
                   ui_version=3
                   )
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/doc')
     assert resp1.status == 200
     retrieved = await resp1.text()
@@ -113,7 +113,7 @@ async def test_swagger_ui(test_client, loop):
     assert retrieved == loaded
 
 
-async def test_swagger_file_url(test_client, loop):
+async def test_swagger_file_url(aiohttp_client, loop):
     TESTS_PATH = abspath(join(dirname(__file__)))
 
     app = web.Application(loop=loop)
@@ -121,7 +121,7 @@ async def test_swagger_file_url(test_client, loop):
                   ui_version=3,
                   swagger_from_file=TESTS_PATH + "/data/example_swagger.yaml")
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/doc/swagger.json')
     assert resp1.status == 200
     result = await resp1.json()
@@ -130,19 +130,19 @@ async def test_swagger_file_url(test_client, loop):
     assert 'API Title' in result['info']['title']
 
 
-async def test_partial_swagger_file(test_client, loop):
+async def test_partial_swagger_file(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping-partial", ping_partial)
     setup_swagger(app, ui_version=3)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/doc/swagger.json')
     assert resp1.status == 200
     result = await resp1.json()
     assert '/ping-partial' in result['paths']
 
 
-async def test_custom_swagger(test_client, loop):
+async def test_custom_swagger(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -154,7 +154,7 @@ async def test_custom_swagger(test_client, loop):
                   api_version="1.0.0",
                   contact="my.custom.contact@example.com")
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
     result = await resp1.json()
@@ -162,7 +162,7 @@ async def test_custom_swagger(test_client, loop):
     assert 'Test Custom Title' in result['info']['title']
 
 
-async def test_swagger_home_decorator(test_client, loop):
+async def test_swagger_home_decorator(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -175,7 +175,7 @@ async def test_swagger_home_decorator(test_client, loop):
                   contact="my.custom.contact@example.com",
                   swagger_home_decor=lambda x: x)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
     result = await resp1.json()
@@ -183,7 +183,7 @@ async def test_swagger_home_decorator(test_client, loop):
     assert 'Test Custom Title' in result['info']['title']
 
 
-async def test_swagger_def_decorator(test_client, loop):
+async def test_swagger_def_decorator(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -196,7 +196,7 @@ async def test_swagger_def_decorator(test_client, loop):
                   contact="my.custom.contact@example.com",
                   swagger_def_decor=lambda x: x)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
     result = await resp1.json()
@@ -210,7 +210,7 @@ def swagger_info():
     return yaml.full_load(open(filename).read())
 
 
-async def test_swagger_info(test_client, loop, swagger_info):
+async def test_swagger_info(aiohttp_client, loop, swagger_info):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
     description = "Test Custom Swagger"
@@ -219,7 +219,7 @@ async def test_swagger_info(test_client, loop, swagger_info):
                   swagger_url="/api/v1/doc",
                   swagger_info=swagger_info)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp1 = await client.get('/api/v1/doc/swagger.json')
     assert resp1.status == 200
     result = await resp1.json()
@@ -228,11 +228,11 @@ async def test_swagger_info(test_client, loop, swagger_info):
     assert 'API Title' in result['info']['title']
 
 
-async def test_undocumented_fn(test_client, loop):
+async def test_undocumented_fn(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/undoc_ping", undoc_ping)
     setup_swagger(app, ui_version=3)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     resp = await client.get('/undoc_ping')
     assert resp.status == 200
     swagger_resp1 = await client.get('/api/doc/swagger.json')
@@ -241,11 +241,11 @@ async def test_undocumented_fn(test_client, loop):
     assert not result['paths']
 
 
-async def test_wrong_method(test_client, loop):
+async def test_wrong_method(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('POST', "/post_ping", ping)
     setup_swagger(app, ui_version=3)
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     # GET
     swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
@@ -256,12 +256,12 @@ async def test_wrong_method(test_client, loop):
     assert resp.status == 405
 
 
-async def test_class_view(test_client, loop):
+async def test_class_view(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(app, ui_version=3)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     # GET
     resp = await client.get('/class_view')
     assert resp.status == 200
@@ -294,7 +294,7 @@ async def test_class_view(test_client, loop):
     assert "patch" not in result['paths']["/class_view"]
 
 
-async def test_data_defs(test_client, loop):
+async def test_data_defs(aiohttp_client, loop):
     TESTS_PATH = abspath(join(dirname(__file__)))
     file = open(TESTS_PATH + "/data/example_data_definitions.json")
     app = web.Application(loop=loop)
@@ -302,7 +302,7 @@ async def test_data_defs(test_client, loop):
     setup_swagger(app, ui_version=3, definitions=json.loads(file.read()))
     file.close()
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
     result = await swagger_resp1.json()
@@ -311,14 +311,14 @@ async def test_data_defs(test_client, loop):
     assert result['components']['schemas']['User']['properties']['permissions']['items']['$ref'] is not None
 
 
-async def test_sub_app(test_client, loop):
+async def test_sub_app(aiohttp_client, loop):
     sub_app = web.Application(loop=loop)
     sub_app.router.add_route('*', "/class_view", ClassView)
     setup_swagger(sub_app, ui_version=3, api_base_url='/sub_app')
     app = web.Application(loop=loop)
     app.add_subapp(prefix='/sub_app', subapp=sub_app)
 
-    client = await test_client(app)
+    client = await aiohttp_client(app)
     # GET
     resp = await client.get('/sub_app/class_view')
     assert resp.status == 200
