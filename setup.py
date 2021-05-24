@@ -55,13 +55,14 @@ class PyTest(TestCommand):
 
 setup(
     name='aiohttp-swagger',
-    version='1.0.15',
+    version='1.0.16',
     install_requires=required,
     url='https://github.com/cr0hn/aiohttp-swagger',
     license='BSD',
     author='Daniel Garcia (cr0hn)',
     author_email='cr0hn@cr0hn.com',
     packages=find_packages(exclude=('tests',)),
+    package_data={'aiohttp_swagger': ['py.typed']},
     include_package_data=True,
     extras_require={
         'performance':  required_performance
@@ -81,6 +82,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Topic :: Security',
+        'Typing :: Typed',
     ],
     tests_require=['pytest', 'pytest-aiohttp'],
     cmdclass=dict(test=PyTest)
