@@ -132,3 +132,8 @@ ENV/
 
 # Pycharm
 .idea/
+
+# Pipenv files
+Pipfile
+Pipfile.lock
+pyproject.toml

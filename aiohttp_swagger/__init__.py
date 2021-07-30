@@ -46,17 +46,22 @@ def setup_swagger(app: web.Application,
                   swagger_info: dict = None,
                   swagger_template_path: str = None,
                   definitions: dict = None,
-                  security_definitions: dict = None):
+                  security_definitions: dict = None,
+                  custom_theme_dir = None
+                  ):
     _swagger_url = ("/{}".format(swagger_url)
                     if not swagger_url.startswith("/")
                     else swagger_url)
     _base_swagger_url = _swagger_url.rstrip('/')
     _swagger_def_url = '{}/swagger.json'.format(_base_swagger_url)
 
-    if ui_version == 3:
-        STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui3"))
+    if custom_theme_dir is None:
+        if ui_version == 3:
+            STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui3"))
+        else:
+            STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
     else:
-        STATIC_PATH = abspath(join(dirname(__file__), "swagger_ui"))
+        STATIC_PATH = abspath(custom_theme_dir)
 
     # Build Swagget Info
     if swagger_info is None:
