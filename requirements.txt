@@ -1,4 +1,3 @@
 pyYAML>=5.1
-markupsafe~=1.1.1
-jinja2~=2.11.2
+jinja2>=2.11.2
 aiohttp>=2.3.10
