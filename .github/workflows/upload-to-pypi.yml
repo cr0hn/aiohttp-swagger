@@ -1,0 +1,27 @@
+name: Build Pypi Artefacts
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1  # v2 does not have submodules option now
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.8'
+
+      - name: Build distribution package
+        run: |
+          python3 -m pip install setuptools wheel
+          python3 -m pip install -r requirements.txt
+          python3 setup.py sdist bdist_wheel
+
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.pypi_password }}
