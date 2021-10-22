@@ -68,6 +68,7 @@ setup(
     },
     description='Swagger API Documentation builder for aiohttp server',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         'Environment :: Console',
         'Intended Audience :: System Administrators',
