@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="x-ua-compatible" content="IE=edge">
   <title>Swagger UI</title>
   <link rel="icon" type="image/png" href="##STATIC_PATH##/images/favicon-32x32.png" sizes="32x32" />
   <link rel="icon" type="image/png" href="##STATIC_PATH##/images/favicon-16x16.png" sizes="16x16" />
@@ -27,9 +28,9 @@
   <script src='##STATIC_PATH##/lib/swagger-oauth.js' type='text/javascript'></script>
 
   <!-- Some basic translations -->
-  <!-- <script src='/swagger_ui/lang/translator.js' type='text/javascript'></script> -->
-  <!-- <script src='/swagger_ui/lang/ru.js' type='text/javascript'></script> -->
-  <!-- <script src='/swagger_ui/lang/en.js' type='text/javascript'></script> -->
+  <!-- <script src='##STATIC_PATH##/lang/translator.js' type='text/javascript'></script> -->
+  <!-- <script src='##STATIC_PATH##/lang/ru.js' type='text/javascript'></script> -->
+  <!-- <script src='##STATIC_PATH##/lang/en.js' type='text/javascript'></script> -->
 
   <script type="text/javascript">
     $(function () {
@@ -75,7 +76,8 @@
         docExpansion: "none",
         jsonEditor: false,
         defaultModelRendering: 'schema',
-        showRequestHeaders: false
+        showRequestHeaders: false,
+        showOperationIds: false
       });
 
       window.swaggerUi.load();
