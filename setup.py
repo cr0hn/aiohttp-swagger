@@ -62,6 +62,7 @@ setup(
     author='Daniel Garcia (cr0hn)',
     author_email='cr0hn@cr0hn.com',
     packages=find_packages(exclude=('tests',)),
+    package_data={'aiohttp_swagger': ['py.typed']},
     include_package_data=True,
     extras_require={
         'performance':  required_performance
@@ -82,6 +83,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Topic :: Security',
+        'Typing :: Typed',
     ],
     tests_require=['pytest', 'pytest-aiohttp'],
     cmdclass=dict(test=PyTest)
