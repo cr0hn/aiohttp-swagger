@@ -299,3 +299,27 @@ Swagger validation
                   api_base_url='/sub_app_prefix',
                   swagger_validator_url='//online.swagger.io/validator'
                   )
+
+Ignore path
++++++++++++
+
+:samp:`aiohttp-swagger` ignores handlers that have an attribute `swagger_ignore` with value `True`. A helper method
+`swagger_ignore`, that can be used as decorator, is available.
+
+
+.. code-block:: python
+
+    from aiohttp import web
+    from aiohttp_swagger import *
+
+    @swagger_ignore
+    async def ping(request):
+        return web.Response(text="pong")
+
+    app = web.Application()
+
+    app.router.add_route('GET', "/ping", ping)
+
+    setup_swagger(app)
+
+    web.run_app(app, host="127.0.0.1")
