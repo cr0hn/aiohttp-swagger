@@ -85,8 +85,9 @@ def setup_swagger(app: web.Application,
 
     # Add API routes
     app.router.add_route('GET', _swagger_url, _swagger_home_func)
-    app.router.add_route('GET', "{}/".format(_base_swagger_url),
-                         _swagger_home_func)
+    if _base_swagger_url:
+        app.router.add_route('GET', "{}/".format(_base_swagger_url),
+                             _swagger_home_func)
     app.router.add_route('GET', _swagger_def_url, _swagger_def_func)
 
     # Set statics
