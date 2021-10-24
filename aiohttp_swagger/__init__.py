@@ -5,7 +5,7 @@ from types import FunctionType
 from aiohttp import web
 
 from .helpers import (generate_doc_from_each_end_point,
-                      load_doc_from_yaml_file, swagger_path)
+                      load_doc_from_yaml_file, swagger_ignore, swagger_path)
 
 try:
     import ujson as json
@@ -108,4 +108,4 @@ def setup_swagger(app: web.Application,
         )
 
 
-__all__ = ("setup_swagger", "swagger_path")
+__all__ = ("setup_swagger", "swagger_path", "swagger_ignore")
