@@ -59,8 +59,8 @@ setup(
     install_requires=required,
     url='https://github.com/cr0hn/aiohttp-swagger',
     license='BSD',
-    author='Daniel Garcia (cr0hn)',
-    author_email='cr0hn@cr0hn.com',
+    author='Daniel Alfocea (cr0hn)',
+    author_email='daniel@danielalfocea.com',
     packages=find_packages(exclude=('tests',)),
     include_package_data=True,
     extras_require={
