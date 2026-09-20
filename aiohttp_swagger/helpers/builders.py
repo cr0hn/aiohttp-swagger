@@ -44,6 +44,8 @@ def _build_doc_from_func_doc(route):
     if isclass(route.handler) and issubclass(route.handler, web.View):
         for method_name in _get_method_names_for_handler(route):
             method = getattr(route.handler, method_name)
+            if getattr(method, "swagger_ignore", False):
+                continue
             if method.__doc__ is not None and "---" in method.__doc__:
                 end_point_doc = method.__doc__.splitlines()
                 out.update(_extract_swagger_docs(end_point_doc, method=method_name))
@@ -131,6 +133,10 @@ def generate_doc_from_each_end_point(
     for route in app.router.routes():
 
         end_point_doc = None
+
+        if getattr(route.handler, "swagger_ignore", False):
+            # Handlers can be ignored from documentation
+            continue
 
         # If route has a external link to doc, we use it, not function doc
         if getattr(route.handler, "swagger_file", False):

@@ -93,6 +93,30 @@ async def ping_partial(request):
     return web.Response(text="pong")
 
 
+@swagger_ignore
+async def ignore(request):
+    return web.Response(text="OK")
+ignore.__doc__ = ping.__doc__
+
+
+class IgnoreView(ClassView):
+
+    @swagger_ignore
+    async def get(self):
+        return await super().get()
+    get.__doc__ = ClassView.get.__doc__
+
+    @swagger_ignore
+    async def patch(self):
+        return await super().patch()
+    patch.__doc__ = ClassView.patch.__doc__
+
+    @swagger_ignore
+    async def post(self):
+        return await super().post()
+    post.__doc__ = ClassView.post.__doc__
+
+
 async def test_ping(aiohttp_client, loop):
     app = web.Application(loop=loop)
     app.router.add_route('GET', "/ping", ping)
@@ -259,6 +283,25 @@ async def test_undocumented_fn(aiohttp_client, loop):
     client = await aiohttp_client(app)
     resp = await client.get('/undoc_ping')
     assert resp.status == 200
+    swagger_resp1 = await client.get('/api/doc/swagger.json')
+    assert swagger_resp1.status == 200
+    result = await swagger_resp1.json()
+    assert not result['paths']
+
+
+async def test_ignored_fn(aiohttp_client, loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('GET', "/ignore", ignore)
+    assert ignore.swagger_ignore is True
+    app.router.add_route('*', "/ignore_view", IgnoreView)
+    assert IgnoreView.get.swagger_ignore is True
+
+    setup_swagger(app, ui_version=3)
+    client = await aiohttp_client(app)
+    for path in ("/ignore", "/ignore_view"):
+        resp = await client.get(path)
+        assert resp.status == 200
+
     swagger_resp1 = await client.get('/api/doc/swagger.json')
     assert swagger_resp1.status == 200
     result = await swagger_resp1.json()
