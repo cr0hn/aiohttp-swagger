@@ -1,4 +1,9 @@
+Version dev
+===========
+- Updated swagger ui version to 3.52.5
+
 Version 1.0.15
+==============
 - Fixes a bug in setup.py where the distribution exports the package tests along with the actual library.
 - Latest js-yaml fixes security issue related to https://www.npmjs.com/advisories/813
 - Added logic that checks whether the route.method is * or contains a single method. When the latter is the case only the method that is specified will be added to the Swagger UI.
